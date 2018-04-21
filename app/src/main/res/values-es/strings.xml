@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="preferences">Preferencias</string>
+    <string name="press_again_back">Pulsa otra vez \'Atrás\' para salir...</string>
+    <string name="show_debug_overlay">Mostrar overlay de debug</string>
+    <string name="zoom">Zoom</string>
+
+</resources>

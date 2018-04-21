@@ -1,0 +1,49 @@
+package osm.mapnotes;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import org.osmdroid.config.Configuration;
+
+public class MyPreferences {
+
+    public boolean mShowDebugOverlay=false;
+
+    public float mLon=0;
+    public float mLat=0;
+    public float mZoom=0;
+
+    void readPreferences(Context context) {
+
+        Configuration.getInstance().load(context,
+                PreferenceManager.getDefaultSharedPreferences(context));
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.key_preference_file), Context.MODE_PRIVATE);
+
+        mLat = sharedPref.getFloat(context.getString(R.string.key_lat), (float) 0.0);
+        mLon = sharedPref.getFloat(context.getString(R.string.key_lon), (float) 0.0);
+        mZoom = sharedPref.getFloat(context.getString(R.string.key_zoom), (float) 5.0);
+
+        mShowDebugOverlay = sharedPref.getBoolean(context.getString(R.string.key_debug), false);
+
+    }
+
+    void storePreferences(Context context) {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.key_preference_file), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putFloat(context.getString(R.string.key_lon), mLon);
+        editor.putFloat(context.getString(R.string.key_lat), mLat);
+        editor.putFloat(context.getString(R.string.key_zoom), mZoom);
+
+        editor.putBoolean(context.getString(R.string.key_debug), mShowDebugOverlay);
+
+        editor.apply();
+
+    }
+}
