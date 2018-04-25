@@ -14,6 +14,17 @@ public class MyPreferences {
     public float mLat=0;
     public float mZoom=0;
 
+    public int mTileSource=0;
+
+    final static int TILE_SOURCE_DEFAULT=0;
+    final static int TILE_SOURCE_FIRST=0;
+    final static int TILE_SOURCE_MAPNIK=0;
+    final static int TILE_SOURCE_HIKEBIKEMAP=1;
+    final static int TILE_SOURCE_PUBLIC_TRANSPORT=2;
+    final static int TILE_SOURCE_USGS_MAP=3;
+    final static int TILE_SOURCE_USGS_TOPO=4;
+    final static int TILE_SOURCE_LAST=4;
+
     void readPreferences(Context context) {
 
         Configuration.getInstance().load(context,
@@ -28,6 +39,7 @@ public class MyPreferences {
 
         mShowDebugOverlay = sharedPref.getBoolean(context.getString(R.string.key_debug), false);
 
+        mTileSource = sharedPref.getInt(context.getString(R.string.key_tile_source), TILE_SOURCE_MAPNIK);
     }
 
     void storePreferences(Context context) {
@@ -43,7 +55,8 @@ public class MyPreferences {
 
         editor.putBoolean(context.getString(R.string.key_debug), mShowDebugOverlay);
 
-        editor.apply();
+        editor.putInt(context.getString(R.string.key_tile_source), mTileSource);
 
+        editor.apply();
     }
 }

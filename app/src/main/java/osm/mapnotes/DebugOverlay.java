@@ -28,21 +28,33 @@ public class DebugOverlay extends Overlay {
             return;
         }
 
-        Paint paint=new Paint();
+        Paint paint = new Paint();
 
         paint.setColor(Color.WHITE);
-        canvas.drawRect(0, 200, 500, 600, paint);
+        drawTextLines(canvas, paint, 5, 250);
 
         paint.setColor(Color.BLACK);
-        paint.setTextSize(30);
+        drawTextLines(canvas, paint, 6, 251);
+    }
+
+    void drawTextLines(Canvas canvas, Paint paint, int x, int y) {
+
+        /*
+        paint.setColor(Color.WHITE);
+        canvas.drawRect(0, 200, 500, 600, paint);
+        */
+
+        //paint.setColor(Color.BLACK);
 
         String text;
 
+        paint.setTextSize(40);
+
         text="Loc Perm: "+mLocationStatus.hasPermissions();
-        canvas.drawText(text,5, 250, paint);
+        canvas.drawText(text, x, y, paint);
 
         text="Loc Enab: "+mLocationStatus.isProviderEnabled();
-        canvas.drawText(text,5, 280, paint);
+        canvas.drawText(text, x, y+30, paint);
 
         text="Loc Stat: ";
 
@@ -64,9 +76,9 @@ public class DebugOverlay extends Overlay {
                 break;
         }
 
-        canvas.drawText(text,5, 310, paint);
+        canvas.drawText(text, x, y+60, paint);
 
         text="Loc Sats: "+mLocationStatus.getNumSats();
-        canvas.drawText(text,5, 340, paint);
+        canvas.drawText(text, x, y+90, paint);
     }
 }

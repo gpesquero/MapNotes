@@ -5,10 +5,12 @@
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>
     <string name="key_preference_file" translatable="false">MapNotes_Preferences</string>
+    <string name="key_tile_source" translatable="false">Tile_Source</string>
     <string name="key_zoom" translatable="false">Key_Zoom</string>
     <string name="preferences">Preferences</string>
     <string name="press_again_back">"Please again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
     <string name="zoom">Zoom</string>
+    <string name="tile_source">Tile Source:</string>
 
 </resources>

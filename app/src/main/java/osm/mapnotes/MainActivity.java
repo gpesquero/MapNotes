@@ -3,6 +3,7 @@ package osm.mapnotes;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         setContentView(R.layout.activity_main);
 
         mMapView = (MapView) findViewById(R.id.map);
-        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+        setMapTileSource();
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
@@ -378,7 +382,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 return;
 
             GeoPoint centerPoint = new GeoPoint(mLocation.getLatitude(), mLocation.getLongitude());
-            mMapController.setCenter(centerPoint);
+            //mMapController.setCenter(centerPoint);
+            mMapController.animateTo(centerPoint);
+
         } else if (view == mImageViewPreferences) {
 
             Intent intent = new Intent(this, PreferencesActivity.class);
@@ -398,7 +404,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         //mDebugOverlay.enable(mPreferences.mShowDebugOverlay);
 
-        mDebugOverlay.onPause();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Configuration.getInstance().save(this, prefs);
+
+        //mDebugOverlay.onPause();
 
         mMapView.onPause();
     }
@@ -409,13 +418,69 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mDebugOverlay.setEnabled(mPreferences.mShowDebugOverlay);
 
+        setMapTileSource();
+
+        /*
+        if (mPreferences.mShowDebugOverlay) {
+
+            if (!mMapView.getOverlays().contains(mDebugOverlay)) {
+
+                mMapView.getOverlays().add(mDebugOverlay);
+            }
+        }
+        else {
+
+            if (mMapView.getOverlays().contains(mDebugOverlay)) {
+
+                mMapView.getOverlays().remove(mDebugOverlay);
+            }
+        }
 
         mDebugOverlay.onResume();
+        */
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
 
         mMapView.onResume();
 
         //mMapView.invalidate();
 
         //mMapController.setZoom(mMapView.getZoomLevelDouble());
+    }
+
+    void setMapTileSource() {
+
+        OnlineTileSourceBase tileSource;
+
+        switch (mPreferences.mTileSource) {
+
+            case MyPreferences.TILE_SOURCE_MAPNIK:
+                tileSource=TileSourceFactory.MAPNIK;
+                break;
+
+            case MyPreferences.TILE_SOURCE_HIKEBIKEMAP:
+                tileSource=TileSourceFactory.HIKEBIKEMAP;
+                break;
+
+            case MyPreferences.TILE_SOURCE_PUBLIC_TRANSPORT:
+                tileSource=TileSourceFactory.PUBLIC_TRANSPORT;
+                break;
+
+            case MyPreferences.TILE_SOURCE_USGS_MAP:
+                tileSource=TileSourceFactory.USGS_SAT;
+                break;
+
+            case MyPreferences.TILE_SOURCE_USGS_TOPO:
+                tileSource=TileSourceFactory.USGS_TOPO;
+                break;
+
+            default:
+                mPreferences.mTileSource=MyPreferences.TILE_SOURCE_MAPNIK;
+                tileSource=TileSourceFactory.MAPNIK;
+                break;
+        }
+
+        mMapView.setTileSource(tileSource);
     }
 }
