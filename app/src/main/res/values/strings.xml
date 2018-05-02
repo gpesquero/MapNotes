@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">MapNotes</string>
+    <string name="dialog_bookmark" translatable="false">Dialog_Bookmark</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>

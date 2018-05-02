@@ -1,6 +1,9 @@
 package osm.mapnotes;
 
 import android.Manifest;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     ImageView mImageViewLocation = null;
     ImageView mImageViewPreferences = null;
+    ImageView mImageViewBookmark= null;
 
     private boolean mTick = true;
 
@@ -98,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mImageViewPreferences = (ImageView) findViewById(R.id.imageViewPreferences);
         mImageViewPreferences.setOnClickListener(this);
+
+        mImageViewBookmark= (ImageView) findViewById(R.id.imageViewBookmark);
+        mImageViewBookmark.setOnClickListener(this);
 
         createLocationIcons(context);
 
@@ -393,8 +400,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             //intent.putExtra(EXTRA_MESSAGE, message);
 
             startActivity(intent);
+        }
+        else if (view == mImageViewBookmark) {
 
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            Fragment prev = getFragmentManager().findFragmentByTag(getString(R.string.dialog_bookmark));
 
+            if (prev != null) {
+                ft.remove(prev);
+            }
+
+            ft.addToBackStack(null);
+
+            //BookMarkDialogFragment fragment=new BookMarkDialogFragment();
+            BookMarkDialogFragment fragment=new BookMarkDialogFragment();
+
+            Bundle args=new Bundle();
+            args.putFloat(getString(R.string.key_lat), 42.5f);
+            args.putFloat(getString(R.string.key_lon), 3.4f);
+
+            fragment.setArguments(args);
+
+            fragment.show(getFragmentManager(), getString(R.string.dialog_bookmark));
         }
     }
 
