@@ -1,17 +1,24 @@
 <resources>
 
     <string name="app_name">MapNotes</string>
-    <string name="dialog_bookmark" translatable="false">Dialog_Bookmark</string>
+    <string name="coordinates_">Coordinates:</string>
+    <string name="dialog_marker" translatable="false">Dialog_Marker</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>
     <string name="key_preference_file" translatable="false">MapNotes_Preferences</string>
     <string name="key_tile_source" translatable="false">Tile_Source</string>
     <string name="key_zoom" translatable="false">Key_Zoom</string>
+    <string name="latitude_">Latitude:</string>
+    <string name="longitude_">Longitude:</string>
     <string name="preferences">Preferences</string>
     <string name="press_again_back">"Please again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
     <string name="zoom">Zoom</string>
     <string name="tile_source">Tile Source:</string>
+    <string name="title_">Title:</string>
+    <string name="marker_name">Marker name</string>
+    <string name="marker_name_">Marker name:</string>
+    <string name="marker">Marker</string>
 
 </resources>

@@ -1,7 +1,6 @@
 package osm.mapnotes;
 
 import android.Manifest;
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -14,6 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -32,15 +32,18 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.util.prefs.Preferences;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, Runnable,
-        View.OnClickListener {
+        View.OnClickListener, MarkerDialogFragment.OnMarkerDialogListener {
 
     // OsmDroid objects
 
@@ -53,6 +56,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     CrossHairOverlay mCrossHairOverlay = null;
     DebugOverlay mDebugOverlay = null;
+
+    //ItemizedOverlayWithFocus mItemOverlay=null;
+    ItemizedIconOverlay mItemOverlay=null;
+
+    ArrayList<OverlayItem> mItems=new ArrayList<OverlayItem>();
 
     private long mPreviousCancelTime = 0;
 
@@ -81,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private Bitmap greenLocationIcon = null;
 
     public static MyPreferences mPreferences = new MyPreferences();
+
+    //private ArrayList<BookMark> mBookMarks=new ArrayList<BookMark>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +159,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mDebugOverlay = new DebugOverlay(mLocationStatus);
         mDebugOverlay.setEnabled(mPreferences.mShowDebugOverlay);
-        mMapView.getOverlays().add(mDebugOverlay);
+        //mMapView.getOverlays().add(mDebugOverlay);
+
+        //mItemOverlay=new ItemizedOverlayWithFocus<OverlayItem>(mItems,
+        mItemOverlay=new ItemizedIconOverlay<OverlayItem>(mItems,
+                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        //do something
+                        return true;
+                    }
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                }, this);
+
+        //mItemOverlay.setFocusItemsOnTap(true);
+        mItemOverlay.setEnabled(true);
+
+        mMapView.getOverlays().add(mItemOverlay);
 
         /*
         Timer timer1sec = new Timer();
@@ -404,7 +433,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         else if (view == mImageViewBookmark) {
 
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            Fragment prev = getFragmentManager().findFragmentByTag(getString(R.string.dialog_bookmark));
+
+            Fragment prev = getFragmentManager().findFragmentByTag(getString(R.string.dialog_marker));
 
             if (prev != null) {
                 ft.remove(prev);
@@ -412,16 +442,45 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             ft.addToBackStack(null);
 
-            //BookMarkDialogFragment fragment=new BookMarkDialogFragment();
-            BookMarkDialogFragment fragment=new BookMarkDialogFragment();
+            MarkerDialogFragment fragment=new MarkerDialogFragment();
 
+            Drawable icon=getResources().getDrawable(android.R.drawable.btn_star_big_on);
+
+            GeoPoint center=(GeoPoint)mMapView.getMapCenter();
+
+            /*
+            OverlayItem item=new OverlayItem("Title", "Snippet", center);
+            item.setMarker(icon);
+
+            mItemOverlay.addItem(item);
+
+            mMapView.invalidate();
+            */
+
+            Marker marker = new Marker(mMapView);
+            marker.setPosition(center);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+            marker.setIcon(icon);
+            marker.setTitle(getString(R.string.marker_name));
+
+
+            fragment.setMarker(marker);
+            fragment.setNewMarker(true);
+
+            //bm.setPosition(center);
+            //bm.setName("Hello");
+
+            //mBookMarks.add(bm);
+
+            /*
             Bundle args=new Bundle();
-            args.putFloat(getString(R.string.key_lat), 42.5f);
-            args.putFloat(getString(R.string.key_lon), 3.4f);
+            args.putDouble(getString(R.string.key_lat), center.getLatitude());
+            args.putDouble(getString(R.string.key_lon), center.getLongitude());
 
             fragment.setArguments(args);
+            */
 
-            fragment.show(getFragmentManager(), getString(R.string.dialog_bookmark));
+            fragment.show(getFragmentManager(), getString(R.string.dialog_marker));
         }
     }
 
@@ -509,5 +568,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
 
         mMapView.setTileSource(tileSource);
+    }
+
+    @Override
+    public void onNewMarker(Marker newMarker) {
+
+        mMapView.getOverlays().add(0, newMarker);
     }
 }

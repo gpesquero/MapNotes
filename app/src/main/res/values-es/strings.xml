@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="coordinates_">Coordenadas:</string>
+    <string name="marker">Marcador</string>
+    <string name="marker_name">Nombre del marcador</string>
+    <string name="marker_name_">Nombre del marcador:</string>
+    <string name="latitude_">Latitud:</string>
+    <string name="longitude_">Longitud:</string>
     <string name="preferences">Preferencias</string>
     <string name="press_again_back">Pulsa otra vez \'Atrás\' para salir...</string>
     <string name="show_debug_overlay">Mostrar overlay de debug</string>
+    <string name="tile_source">Fuente de las teselas:</string>
+    <string name="title_">Título:</string>
     <string name="zoom">Zoom</string>
-    <string name="tile_source">Tile Source:</string>
+
+
+
 
 </resources>
