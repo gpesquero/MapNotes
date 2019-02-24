@@ -1,8 +1,10 @@
 package osm.mapnotes;
 
 
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,31 +12,40 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.osmdroid.views.overlay.Marker;
 
-public class MarkerDialogFragment extends DialogFragment implements View.OnClickListener {
+public class MarkerDialogFragment extends DialogFragment implements View.OnClickListener,
+        DialogInterface.OnClickListener {
 
     Button mButtonOk=null;
     Button mButtonCancel=null;
+
+    TextView mTextViewTimeStamp=null;
 
     TextView mTextViewLatValue=null;
     TextView mTextViewLonValue=null;
 
     EditText mEditTextName=null;
 
+    ImageButton mImageButtonDelete=null;
+
     boolean mIsNewMarker=true;
+
+    Context mContext=null;
 
     // Container Activity must implement this interface
     public interface OnMarkerDialogListener {
 
-        public void onNewMarker(Marker marker);
+        public void onNewMarker(MyMarker marker);
+        public void onDeleteMarker(MyMarker marker);
     }
 
     OnMarkerDialogListener mListener=null;
 
-    Marker mMarker=null;
+    MyMarker mMarker=null;
 
     public void BookMarkDialogFragment(Marker marker) {
 
@@ -44,6 +55,8 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        mContext=context;
 
         try {
             mListener = (OnMarkerDialogListener)context;
@@ -75,8 +88,13 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
         mButtonCancel=v.findViewById(R.id.buttonCancel);
         mButtonCancel.setOnClickListener(this);
 
-        //double lat=getArguments().getDouble(getActivity().getString(R.string.key_lat));
-        //double lon=getArguments().getDouble(getActivity().getString(R.string.key_lon));
+        mImageButtonDelete=v.findViewById(R.id.imageButtonDelete);
+        mImageButtonDelete.setOnClickListener(this);
+
+        mImageButtonDelete.setVisibility(mIsNewMarker? View.INVISIBLE : View.VISIBLE);
+
+        mTextViewTimeStamp=v.findViewById(R.id.textViewTimeStamp);
+        mTextViewTimeStamp.setText(mMarker.getId());
 
         double lat=mMarker.getPosition().getLatitude();
         double lon=mMarker.getPosition().getLongitude();
@@ -92,8 +110,8 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
         mEditTextName.selectAll();
         mEditTextName.requestFocus();
 
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
         return v;
     }
@@ -112,14 +130,28 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
             }
 
             this.dismiss();
+
+            //mListener.onHideSoftInput();
         }
         else if (view==mButtonCancel) {
 
             this.dismiss();
+
+            //mListener.onHideSoftInput();
+
+            //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            //imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+        else if (view==mImageButtonDelete) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+            builder.setMessage(R.string.are_you_sure).setNegativeButton(android.R.string.cancel, this)
+                    .setPositiveButton(R.string.delete, this).show();
         }
     }
 
-    public void setMarker(Marker marker) {
+    public void setMarker(MyMarker marker) {
 
         mMarker=marker;
     }
@@ -127,5 +159,16 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
     public void setNewMarker(boolean isNewMarker) {
 
         mIsNewMarker=isNewMarker;
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        if (which==DialogInterface.BUTTON_POSITIVE) {
+
+            mListener.onDeleteMarker(mMarker);
+
+            this.dismiss();
+        }
     }
 }

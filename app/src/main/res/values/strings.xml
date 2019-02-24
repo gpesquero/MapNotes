@@ -1,7 +1,9 @@
 <resources>
 
-    <string name="app_name">MapNotes</string>
+    <string name="app_name" translatable="false">MapNotes</string>
+    <string name="are_you_sure">Are you sure?</string>
     <string name="coordinates_">Coordinates:</string>
+    <string name="delete">Delete</string>
     <string name="dialog_marker" translatable="false">Dialog_Marker</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
@@ -11,14 +13,16 @@
     <string name="key_zoom" translatable="false">Key_Zoom</string>
     <string name="latitude_">Latitude:</string>
     <string name="longitude_">Longitude:</string>
+    <string name="marker">Marker</string>
+    <string name="marker_deleted_">Marker deleted !!</string>
+    <string name="marker_name">Marker name</string>
+    <string name="marker_name_">Marker name:</string>
     <string name="preferences">Preferences</string>
     <string name="press_again_back">"Please again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
-    <string name="zoom">Zoom</string>
     <string name="tile_source">Tile Source:</string>
+    <string name="time_stamp_">Time Stamp:</string>
     <string name="title_">Title:</string>
-    <string name="marker_name">Marker name</string>
-    <string name="marker_name_">Marker name:</string>
-    <string name="marker">Marker</string>
+    <string name="zoom">Zoom</string>
 
 </resources>

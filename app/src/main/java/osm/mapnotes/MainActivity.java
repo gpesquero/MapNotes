@@ -34,16 +34,21 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, Runnable,
-        View.OnClickListener, MarkerDialogFragment.OnMarkerDialogListener {
+        View.OnClickListener, MarkerDialogFragment.OnMarkerDialogListener,
+        MyMarker.OnMyMarkerListener {
 
     // OsmDroid objects
 
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public static MyPreferences mPreferences = new MyPreferences();
 
-    //private ArrayList<BookMark> mBookMarks=new ArrayList<BookMark>();
+    //private ArrayList<MyMarker> mBookMarks=new ArrayList<MyMarker>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +103,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         Context context = getApplicationContext();
 
-        mPreferences.readPreferences(context);
+        mPreferences.loadPreferences(context);
+
+        /*
+        if (savedInstanceState==null) {
+
+            mPreferences.loadPreferences(context);
+        }
+        else {
+
+            mPreferences.loadState(context, savedInstanceState);
+        }
+        */
 
         setContentView(R.layout.activity_main);
 
@@ -110,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mImageViewLocation = (ImageView) findViewById(R.id.imageViewLocation);
         mImageViewLocation.setOnClickListener(this);
 
-        mImageViewPreferences = (ImageView) findViewById(R.id.imageViewPreferences);
+        mImageViewPreferences = findViewById(R.id.imageViewPreferences);
         mImageViewPreferences.setOnClickListener(this);
 
         mImageViewBookmark= (ImageView) findViewById(R.id.imageViewBookmark);
@@ -199,6 +215,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         //Toast.makeText(this, "Start...", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+
+    }
+
+    /*
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        mPreferences.saveState(getApplicationContext(), outState);
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
+    }
+    */
+
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults) {
@@ -259,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         Context context = getApplicationContext();
 
-        mPreferences.storePreferences(context);
+        mPreferences.savePreferences(context);
     }
 
     @Override
@@ -432,6 +464,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         else if (view == mImageViewBookmark) {
 
+            /*
             FragmentTransaction ft = getFragmentManager().beginTransaction();
 
             Fragment prev = getFragmentManager().findFragmentByTag(getString(R.string.dialog_marker));
@@ -441,8 +474,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
 
             ft.addToBackStack(null);
+            */
 
-            MarkerDialogFragment fragment=new MarkerDialogFragment();
+
 
             Drawable icon=getResources().getDrawable(android.R.drawable.btn_star_big_on);
 
@@ -457,15 +491,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             mMapView.invalidate();
             */
 
-            Marker marker = new Marker(mMapView);
+            String timeStamp;
+
+            Date d=new Date(System.currentTimeMillis());
+
+            timeStamp=d.toString();
+
+            MyMarker marker=new MyMarker(mMapView, this);
+
+            //Marker marker = new Marker(mMapView);
+
             marker.setPosition(center);
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
             marker.setIcon(icon);
-            marker.setTitle(getString(R.string.marker_name));
+            marker.setDraggable(false);
+            marker.setTitle("");
+            marker.setId(timeStamp);
 
-
+            MarkerDialogFragment fragment=new MarkerDialogFragment();
             fragment.setMarker(marker);
             fragment.setNewMarker(true);
+
+            //fragment.setOnDismissListener(this);
+
+
 
             //bm.setPosition(center);
             //bm.setName("Hello");
@@ -571,8 +620,56 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     @Override
-    public void onNewMarker(Marker newMarker) {
+    public void onNewMarker(MyMarker newMarker) {
 
         mMapView.getOverlays().add(0, newMarker);
     }
+
+    @Override
+    public void onDeleteMarker(MyMarker marker) {
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        if (overlays.contains(marker)) {
+
+            marker.closeInfoWindow();
+
+            overlays.remove(marker);
+
+            Toast.makeText(this, R.string.marker_deleted_, Toast.LENGTH_LONG).show();
+        }
+        else {
+
+            Toast.makeText(this,"Cannot delete marker !!", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    @Override
+    public void onLongPress(MyMarker marker) {
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        if (overlays.contains(marker)) {
+
+            MarkerDialogFragment fragment=new MarkerDialogFragment();
+            fragment.setMarker(marker);
+            fragment.setNewMarker(false);
+
+            fragment.show(getFragmentManager(), getString(R.string.dialog_marker));
+
+
+            //overlays.remove(marker);
+        }
+
+    }
+
+    /*
+    @Override
+    public void onHideSoftInput() {
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+    */
 }

@@ -17,6 +17,27 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/textViewTimeStamp_"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/time_stamp_"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewTimeStamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="0"
+                android:text="@string/time_stamp_" />
+
+            <TextView
                 android:id="@+id/textViewCoordinates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,7 +108,7 @@
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/imageButtonDelete"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="10dp"
@@ -108,7 +129,7 @@
     <EditText
         android:id="@+id/editTextName"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:ems="10"
         android:inputType="textAutoCorrect|textAutoComplete|textMultiLine|textImeMultiLine"
