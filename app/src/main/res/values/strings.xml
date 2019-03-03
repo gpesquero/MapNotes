@@ -3,6 +3,8 @@
     <string name="app_name" translatable="false">MapNotes</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="coordinates_">Coordinates:</string>
+    <string name="database_name" translatable="false">MapNotes.db</string>
+    <string name="database_path_">Database path:</string>
     <string name="delete">Delete</string>
     <string name="dialog_marker" translatable="false">Dialog_Marker</string>
     <string name="key_debug" translatable="false">Key_Debug</string>

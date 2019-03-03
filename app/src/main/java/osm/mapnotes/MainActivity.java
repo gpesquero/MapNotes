@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -44,6 +45,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, Runnable,
@@ -78,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     LocationStatus mLocationStatus = new LocationStatus();
 
     Location mLocation = null;
+
+    MapDatabase mDatabase=null;
+
+    Drawable mMarkerIcon=null;
 
     private static int REQUEST_CODE_LOCATION = 0;
 
@@ -196,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mMapView.getOverlays().add(mItemOverlay);
 
+        mMarkerIcon=getResources().getDrawable(android.R.drawable.btn_star_big_on);
+
         /*
         Timer timer1sec = new Timer();
         timer1sec.schedule(new TimerTask() {
@@ -212,13 +220,72 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         updateLocationStatus();
 
-        //Toast.makeText(this, "Start...", Toast.LENGTH_SHORT).show();
+        //mDatabase=new MapDatabase();
+
+        //mDatabase.openOrCreate(this, "MapNotes.db");
+
+        /*
+        String path;
+
+        //SQLiteDatabase.CursorFactory factory=new SQLiteDatabase.CursorFactory();
+
+        SQLiteDatabase db=openOrCreateDatabase("Marcadores", MODE_PRIVATE, null);
+
+        if (db.isOpen()) {
+
+            if (!db.isReadOnly()) {
+
+                path=db.getPath();
+            }
+        }
+
+        db.execSQL("CREATE TABLE markers (id INTEGER PRIMARY KEY, name TEXT)");
+
+        db.close();
+        */
+
+
+        mDatabase=new MapDatabase();
+
+        String text;
+
+        if (!mDatabase.openOrCreate(mPreferences.mDatabaseDir, mPreferences.mDatabaseName)) {
+
+            text="Database Error: "+mDatabase.mLastErrorString;
+        }
+        else {
+
+            List<MyMarker> markers=mDatabase.getMarkers(mMapView, this, mMarkerIcon);
+
+            if (markers==null) {
+
+                text="Error getting database markers...";
+            }
+            else {
+
+                text="Map Database Ok! Found "+markers.size()+" markers...";
+
+                Iterator<MyMarker> iter=markers.iterator();
+
+                while(iter.hasNext()) {
+
+                    MyMarker marker=iter.next();
+
+                    mMapView.getOverlays().add(marker);
+                }
+            }
+        }
+
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+
     }
 
+    /*
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
 
     }
+    */
 
     /*
     @Override
@@ -292,6 +359,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Context context = getApplicationContext();
 
         mPreferences.savePreferences(context);
+
+        if (mDatabase!=null) {
+
+            mDatabase.close();
+            mDatabase=null;
+        }
+
+        //Toast.makeText(this, "onDestroy()", Toast.LENGTH_LONG).show();
+
+
     }
 
     @Override
@@ -476,10 +553,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             ft.addToBackStack(null);
             */
 
-
-
-            Drawable icon=getResources().getDrawable(android.R.drawable.btn_star_big_on);
-
             GeoPoint center=(GeoPoint)mMapView.getMapCenter();
 
             /*
@@ -491,28 +564,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             mMapView.invalidate();
             */
 
-            String timeStamp;
-
-            Date d=new Date(System.currentTimeMillis());
-
-            timeStamp=d.toString();
-
+            /*
             MyMarker marker=new MyMarker(mMapView, this);
-
-            //Marker marker = new Marker(mMapView);
-
             marker.setPosition(center);
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-            marker.setIcon(icon);
+            marker.setIcon(mMarkerIcon);
             marker.setDraggable(false);
             marker.setTitle("");
             marker.setId(timeStamp);
+            */
 
             MarkerDialogFragment fragment=new MarkerDialogFragment();
-            fragment.setMarker(marker);
-            fragment.setNewMarker(true);
+            //fragment.setMarker(marker);
+            //fragment.setNewMarker(true);
 
             //fragment.setOnDismissListener(this);
+
+            fragment.mIsNewMarker=true;
+            fragment.mLon=center.getLongitude();
+            fragment.mLat=center.getLatitude();
+            fragment.mName="";
+
+            Date d=new Date(System.currentTimeMillis());
+            fragment.mTimeStamp=d.toString();
+
 
 
 
@@ -620,29 +695,143 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     @Override
-    public void onNewMarker(MyMarker newMarker) {
+    public void onNewMarker(Bundle markerDataBundle) {
 
-        mMapView.getOverlays().add(0, newMarker);
-    }
+        MyMarker marker=new MyMarker(mMapView, this);
 
-    @Override
-    public void onDeleteMarker(MyMarker marker) {
+        GeoPoint center=new GeoPoint(
+                markerDataBundle.getDouble(MarkerDialogFragment.KEY_LAT),
+                markerDataBundle.getDouble(MarkerDialogFragment.KEY_LON));
 
-        List<Overlay> overlays=mMapView.getOverlays();
+        marker.setPosition(center);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        marker.setIcon(mMarkerIcon);
+        marker.setDraggable(false);
+        marker.setTitle(markerDataBundle.getString(MarkerDialogFragment.KEY_NAME));
+        marker.setId(markerDataBundle.getString(MarkerDialogFragment.KEY_TIME_STAMP));
 
-        if (overlays.contains(marker)) {
+        if (!mDatabase.addMarker(marker)) {
 
-            marker.closeInfoWindow();
-
-            overlays.remove(marker);
-
-            Toast.makeText(this, R.string.marker_deleted_, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "MapDatabase.addMarker() error: "+
+                    mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
         }
         else {
 
-            Toast.makeText(this,"Cannot delete marker !!", Toast.LENGTH_LONG).show();
+            mMapView.getOverlays().add(0, marker);
+        }
+    }
+
+    @Override
+    public void onDeleteMarker(String markerTimeStamp) {
+
+        // First, search marker
+
+        boolean markerFound=false;
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        Iterator<Overlay> iterator=overlays.iterator();
+
+        while(iterator.hasNext()) {
+
+            Overlay overlay=iterator.next();
+
+            if (overlay instanceof MyMarker) {
+
+                MyMarker marker=(MyMarker) overlay;
+
+                if (marker.getId().compareTo(markerTimeStamp)==0) {
+
+                    markerFound=true;
+
+                    if (overlays.contains(marker)) {
+
+                        marker.closeInfoWindow();
+
+                        overlays.remove(marker);
+
+                        if (!mDatabase.deleteMarker(marker)) {
+
+                            Toast.makeText(this, "MapDatabase.deleteMarker() error: " +
+                                    mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
+                        } else {
+
+                            Toast.makeText(this, "MapDatabase.deleteMarker() Ok",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else {
+
+                        Toast.makeText(this,"Cannot delete marker !!",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    break;
+                }
+            }
         }
 
+        if (!markerFound) {
+
+            Toast.makeText(this, "MapDatabase.deleteMarker() error. Marker not found",
+                    Toast.LENGTH_LONG).show();
+
+
+        }
+    }
+
+    @Override
+    public void onUpdateMarker(Bundle markerDataBundle) {
+
+        String timeStamp=markerDataBundle.getString(MarkerDialogFragment.KEY_TIME_STAMP);
+
+        // First, search marker
+
+        boolean markerFound=false;
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        Iterator<Overlay> iterator=overlays.iterator();
+
+        while(iterator.hasNext()) {
+
+            Overlay overlay=iterator.next();
+
+            if (overlay instanceof MyMarker) {
+
+                MyMarker marker=(MyMarker) overlay;
+
+                if (marker.getId().compareTo(timeStamp)==0) {
+
+                    markerFound=true;
+
+                    marker.setTitle(markerDataBundle.getString(MarkerDialogFragment.KEY_NAME));
+
+                    marker.closeInfoWindow();
+
+                    if (!mDatabase.updateMarker(marker)) {
+
+                        Toast.makeText(this, "MapDatabase.updateMarker() error: " +
+                                mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
+                    }
+                    else {
+
+                        Toast.makeText(this, "MapDatabase.updateMarker() Ok",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        if (!markerFound) {
+
+            Toast.makeText(this, "MapDatabase.updateMarker() error. Marker not found",
+                    Toast.LENGTH_LONG).show();
+
+
+        }
     }
 
     @Override
@@ -653,8 +842,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (overlays.contains(marker)) {
 
             MarkerDialogFragment fragment=new MarkerDialogFragment();
-            fragment.setMarker(marker);
-            fragment.setNewMarker(false);
+            //fragment.setMarker(marker);
+            //fragment.setNewMarker(false);
+
+            fragment.mIsNewMarker=false;
+            fragment.mLon=marker.getPosition().getLongitude();
+            fragment.mLat=marker.getPosition().getLatitude();
+            fragment.mName=marker.getTitle();
+            fragment.mTimeStamp=marker.getId();
 
             fragment.show(getFragmentManager(), getString(R.string.dialog_marker));
 

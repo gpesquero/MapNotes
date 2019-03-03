@@ -17,8 +17,12 @@ import android.widget.TextView;
 
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.Date;
+
 public class MarkerDialogFragment extends DialogFragment implements View.OnClickListener,
         DialogInterface.OnClickListener {
+
+    // Controls
 
     Button mButtonOk=null;
     Button mButtonCancel=null;
@@ -31,26 +35,42 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
     EditText mEditTextName=null;
 
     ImageButton mImageButtonDelete=null;
+    ImageButton mImageButtonOk=null;
+
+    // Constants
+    public static String KEY_IS_NEW_MARKER="key_is_new_marker";
+    public static String KEY_LON="key_lon";
+    public static String KEY_LAT="key_lat";
+    public static String KEY_NAME="key_name";
+    public static String KEY_TIME_STAMP="key_time_stamp";
+
+    // Variables
 
     boolean mIsNewMarker=true;
+    public double mLon=0.0;
+    public double mLat=0.0;
+    public String mName="";
+    public String mTimeStamp="";
 
     Context mContext=null;
+    OnMarkerDialogListener mListener=null;
+
+    //MyMarker mMarker=null;
 
     // Container Activity must implement this interface
     public interface OnMarkerDialogListener {
 
-        public void onNewMarker(MyMarker marker);
-        public void onDeleteMarker(MyMarker marker);
+        public void onNewMarker(Bundle markerDataBundle);
+        public void onDeleteMarker(String markerTimeStamp);
+        public void onUpdateMarker(Bundle markerDataBundle);
     }
 
-    OnMarkerDialogListener mListener=null;
-
-    MyMarker mMarker=null;
-
+    /*
     public void BookMarkDialogFragment(Marker marker) {
 
-        mMarker=null;
+        //mMarker=null;
     }
+    */
 
     @Override
     public void onAttach(Context context) {
@@ -72,6 +92,15 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
         super.onCreate(savedInstanceState);
 
         setStyle(DialogFragment.STYLE_NORMAL, R.style.MyFragmentStyle);
+
+        if (savedInstanceState!=null) {
+
+            mIsNewMarker = savedInstanceState.getBoolean(KEY_IS_NEW_MARKER);
+            mLon = savedInstanceState.getDouble(KEY_LON);
+            mLat = savedInstanceState.getDouble(KEY_LAT);
+            mName = savedInstanceState.getString(KEY_NAME);
+            mTimeStamp = savedInstanceState.getString(KEY_TIME_STAMP);
+        }
     }
 
     @Override
@@ -84,9 +113,14 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
 
         mButtonOk=v.findViewById(R.id.buttonOk);
         mButtonOk.setOnClickListener(this);
+        mButtonOk.setVisibility(View.GONE);
 
         mButtonCancel=v.findViewById(R.id.buttonCancel);
         mButtonCancel.setOnClickListener(this);
+        mButtonCancel.setVisibility(View.GONE);
+
+        mImageButtonOk=v.findViewById(R.id.imageButtonOk);
+        mImageButtonOk.setOnClickListener(this);
 
         mImageButtonDelete=v.findViewById(R.id.imageButtonDelete);
         mImageButtonDelete.setOnClickListener(this);
@@ -94,19 +128,21 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
         mImageButtonDelete.setVisibility(mIsNewMarker? View.INVISIBLE : View.VISIBLE);
 
         mTextViewTimeStamp=v.findViewById(R.id.textViewTimeStamp);
-        mTextViewTimeStamp.setText(mMarker.getId());
+        mTextViewTimeStamp.setText(mTimeStamp);
 
-        double lat=mMarker.getPosition().getLatitude();
-        double lon=mMarker.getPosition().getLongitude();
+        //double lat=mMarker.getPosition().getLatitude();
+        //double lon=mMarker.getPosition().getLongitude();
 
         mTextViewLatValue=v.findViewById(R.id.textViewLatValue);
-        mTextViewLatValue.setText(String.format("%01.6f", lat));
+        mTextViewLatValue.setText(String.format("%01.6f\u00B0", mLat)+" ("+
+                        Util.formatLatitude(mLat)+")");
 
         mTextViewLonValue=v.findViewById(R.id.textViewLonValue);
-        mTextViewLonValue.setText(String.format("%01.6f", lon));
+        mTextViewLonValue.setText(String.format("%01.6f\u00B0", mLon)+" ("+
+                        Util.formatLongitude(mLon)+")");
 
         mEditTextName=v.findViewById(R.id.editTextName);
-        mEditTextName.setText(mMarker.getTitle());
+        mEditTextName.setText(mName);
         mEditTextName.selectAll();
         mEditTextName.requestFocus();
 
@@ -120,13 +156,25 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
     @Override
     public void onClick(View view) {
 
-        if (view==mButtonOk) {
+        //if (view==mButtonOk) {
+        if (view==mImageButtonOk) {
 
-            mMarker.setTitle(mEditTextName.getText().toString());
+            mName=mEditTextName.getText().toString();
+
+            Bundle markerDataBundle=new Bundle();
+
+            markerDataBundle.putDouble(KEY_LON, mLon);
+            markerDataBundle.putDouble(KEY_LAT, mLat);
+            markerDataBundle.putString(KEY_NAME, mName);
+            markerDataBundle.putString(KEY_TIME_STAMP, mTimeStamp);
 
             if (mIsNewMarker) {
 
-                mListener.onNewMarker(mMarker);
+                mListener.onNewMarker(markerDataBundle);
+            }
+            else {
+
+                mListener.onUpdateMarker(markerDataBundle);
             }
 
             this.dismiss();
@@ -151,6 +199,7 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
         }
     }
 
+    /*
     public void setMarker(MyMarker marker) {
 
         mMarker=marker;
@@ -160,15 +209,26 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
 
         mIsNewMarker=isNewMarker;
     }
+    */
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
         if (which==DialogInterface.BUTTON_POSITIVE) {
 
-            mListener.onDeleteMarker(mMarker);
+            mListener.onDeleteMarker(mTimeStamp);
 
             this.dismiss();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+
+        outState.putBoolean(KEY_IS_NEW_MARKER, mIsNewMarker);
+        outState.putDouble(KEY_LON, mLon);
+        outState.putDouble(KEY_LAT, mLat);
+        outState.putString(KEY_NAME, mName);
+        outState.putString(KEY_TIME_STAMP, mTimeStamp);
     }
 }

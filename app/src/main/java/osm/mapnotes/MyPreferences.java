@@ -3,6 +3,7 @@ package osm.mapnotes;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import org.osmdroid.config.Configuration;
@@ -26,6 +27,9 @@ public class MyPreferences {
     final static int TILE_SOURCE_USGS_TOPO=4;
     final static int TILE_SOURCE_LAST=4;
 
+    public String mDatabaseDir=null;
+    public String mDatabaseName=null;
+
     void loadPreferences(Context context) {
 
         Configuration.getInstance().load(context,
@@ -41,6 +45,16 @@ public class MyPreferences {
         mShowDebugOverlay = sharedPref.getBoolean(context.getString(R.string.key_debug), false);
 
         mTileSource = sharedPref.getInt(context.getString(R.string.key_tile_source), TILE_SOURCE_MAPNIK);
+
+        /*
+        mDatabaseDir=Environment.getDataDirectory().getAbsolutePath()+"/"+
+                context.getString(R.string.app_name)+"/";
+        */
+
+        mDatabaseDir=Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+
+                context.getString(R.string.app_name)+"/";
+
+        mDatabaseName=context.getString(R.string.database_name);
     }
 
     /*

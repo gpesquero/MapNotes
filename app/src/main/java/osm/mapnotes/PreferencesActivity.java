@@ -6,12 +6,15 @@ import android.widget.CheckBox;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 public class PreferencesActivity extends AppCompatActivity {
 
     CheckBox mCheckBoxShowDebugOverlay;
 
     RadioGroup mRadioGroupTileSource;
+
+    TextView mTextViewDatabasePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,10 @@ public class PreferencesActivity extends AppCompatActivity {
         RadioButton radioButton=(RadioButton)mRadioGroupTileSource.getChildAt(
                 MainActivity.mPreferences.mTileSource+1);
         radioButton.setChecked(true);
+
+        mTextViewDatabasePath=(TextView)findViewById(R.id.textViewDatabasePath);
+        mTextViewDatabasePath.setText(MainActivity.mPreferences.mDatabaseDir+
+                MainActivity.mPreferences.mDatabaseName);
     }
 
     @Override

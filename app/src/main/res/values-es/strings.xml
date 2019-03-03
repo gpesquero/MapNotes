@@ -3,6 +3,7 @@
 
     <string name="are_you_sure">¿Está seguro?</string>
     <string name="coordinates_">Coordenadas:</string>
+    <string name="database_path_">Path Base de Datos:</string>
     <string name="delete">Borrar</string>
     <string name="marker">Marcador</string>
     <string name="marker_deleted_">Marcador borrado !!</string>

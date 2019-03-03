@@ -1,12 +1,14 @@
 package osm.mapnotes;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.MotionEvent;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-public class MyMarker extends Marker {
+public class MyMarker extends Marker /*implements Parcelable*/ {
 
     // Container Activity must implement this interface
     public interface OnMyMarkerListener {
@@ -36,6 +38,16 @@ public class MyMarker extends Marker {
 
         return touched;
     }
+
+    /*
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(mData);
+    }
+    */
 
     /*
     void setPosition(IGeoPoint position) {
