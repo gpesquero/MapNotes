@@ -22,17 +22,19 @@ public class PreferencesActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_preferences);
 
-        mCheckBoxShowDebugOverlay=(CheckBox)findViewById(R.id.checkBoxDebug);
+        mCheckBoxShowDebugOverlay=findViewById(R.id.checkBoxDebug);
         mCheckBoxShowDebugOverlay.setChecked(MainActivity.mPreferences.mShowDebugOverlay);
 
-        mRadioGroupTileSource=(RadioGroup)findViewById(R.id.radioGroupTileSource);
+        mRadioGroupTileSource=findViewById(R.id.radioGroupTileSource);
         RadioButton radioButton=(RadioButton)mRadioGroupTileSource.getChildAt(
                 MainActivity.mPreferences.mTileSource+1);
         radioButton.setChecked(true);
 
-        mTextViewDatabasePath=(TextView)findViewById(R.id.textViewDatabasePath);
-        mTextViewDatabasePath.setText(MainActivity.mPreferences.mDatabaseDir+
-                MainActivity.mPreferences.mDatabaseName);
+        mTextViewDatabasePath=findViewById(R.id.textViewDatabasePath);
+
+        String fullPath=MainActivity.mPreferences.mDatabaseDir+
+                MainActivity.mPreferences.mDatabaseName;
+        mTextViewDatabasePath.setText(fullPath);
     }
 
     @Override

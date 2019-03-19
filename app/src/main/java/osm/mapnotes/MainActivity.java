@@ -1,13 +1,10 @@
 package osm.mapnotes;
 
 import android.Manifest;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -42,7 +39,6 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -64,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     CrossHairOverlay mCrossHairOverlay = null;
     DebugOverlay mDebugOverlay = null;
 
-    //ItemizedOverlayWithFocus mItemOverlay=null;
     ItemizedIconOverlay mItemOverlay=null;
 
     ArrayList<OverlayItem> mItems=new ArrayList<OverlayItem>();
@@ -101,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public static MyPreferences mPreferences = new MyPreferences();
 
-    //private ArrayList<MyMarker> mBookMarks=new ArrayList<MyMarker>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,31 +104,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mPreferences.loadPreferences(context);
 
-        /*
-        if (savedInstanceState==null) {
-
-            mPreferences.loadPreferences(context);
-        }
-        else {
-
-            mPreferences.loadState(context, savedInstanceState);
-        }
-        */
-
         setContentView(R.layout.activity_main);
 
-        mMapView = (MapView) findViewById(R.id.map);
+        mMapView=(MapView)findViewById(R.id.map);
         setMapTileSource();
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
-        mImageViewLocation = (ImageView) findViewById(R.id.imageViewLocation);
+        mImageViewLocation=(ImageView)findViewById(R.id.imageViewLocation);
         mImageViewLocation.setOnClickListener(this);
 
-        mImageViewPreferences = findViewById(R.id.imageViewPreferences);
+        mImageViewPreferences=(ImageView)findViewById(R.id.imageViewPreferences);
         mImageViewPreferences.setOnClickListener(this);
 
-        mImageViewBookmark= (ImageView) findViewById(R.id.imageViewBookmark);
+        mImageViewBookmark=(ImageView)findViewById(R.id.imageViewAddMarker);
         mImageViewBookmark.setOnClickListener(this);
 
         createLocationIcons(context);
@@ -181,9 +163,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mDebugOverlay = new DebugOverlay(mLocationStatus);
         mDebugOverlay.setEnabled(mPreferences.mShowDebugOverlay);
-        //mMapView.getOverlays().add(mDebugOverlay);
 
-        //mItemOverlay=new ItemizedOverlayWithFocus<OverlayItem>(mItems,
         mItemOverlay=new ItemizedIconOverlay<OverlayItem>(mItems,
                         new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
@@ -263,7 +243,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
             else {
 
-                text="Map Database Ok! Found "+markers.size()+" markers...";
+                // Map database is ok...
+
+                text=getString(R.string.found)+" "+markers.size()+" "+getString(R.string.markers)+"...";
 
                 Iterator<MyMarker> iter=markers.iterator();
 
@@ -718,6 +700,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         else {
 
             mMapView.getOverlays().add(0, marker);
+
+            Toast.makeText(this, getString(R.string.marker_added_),
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -756,7 +741,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                                     mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
                         } else {
 
-                            Toast.makeText(this, "MapDatabase.deleteMarker() Ok",
+                            Toast.makeText(this, getString(R.string.marker_deleted_),
                                     Toast.LENGTH_LONG).show();
                         }
                     }
@@ -816,7 +801,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     }
                     else {
 
-                        Toast.makeText(this, "MapDatabase.updateMarker() Ok",
+                        Toast.makeText(this, getString(R.string.marker_updated_),
                                 Toast.LENGTH_LONG).show();
                     }
 

@@ -22,6 +22,7 @@ public class LocationStatus {
     }
 
     public boolean isProviderEnabled() {
+
         return mProviderEnabled;
     }
 

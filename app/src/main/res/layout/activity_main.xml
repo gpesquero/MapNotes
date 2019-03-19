@@ -39,7 +39,7 @@
         app:srcCompat="@android:drawable/ic_menu_preferences" />
 
     <ImageView
-        android:id="@+id/imageViewBookmark"
+        android:id="@+id/imageViewAddMarker"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"

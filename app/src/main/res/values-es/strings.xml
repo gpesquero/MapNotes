@@ -5,10 +5,14 @@
     <string name="coordinates_">Coordenadas:</string>
     <string name="database_path_">Path Base de Datos:</string>
     <string name="delete">Borrar</string>
+    <string name="found">Encontrados</string>
     <string name="marker">Marcador</string>
-    <string name="marker_deleted_">Marcador borrado !!</string>
+    <string name="marker_added_">¡¡ Marcador añadido !!</string>
+    <string name="marker_deleted_">¡¡ Marcador borrado !!</string>
     <string name="marker_name">Nombre del marcador</string>
     <string name="marker_name_">Nombre del marcador:</string>
+    <string name="marker_updated_">¡¡ Marcador actualizado !!</string>
+    <string name="markers">marcadores</string>
     <string name="latitude_">Latitud:</string>
     <string name="longitude_">Longitud:</string>
     <string name="preferences">Preferencias</string>

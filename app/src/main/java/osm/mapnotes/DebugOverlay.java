@@ -10,7 +10,7 @@ import org.osmdroid.views.overlay.Overlay;
 
 public class DebugOverlay extends Overlay {
 
-    public LocationStatus mLocationStatus=null;
+    private LocationStatus mLocationStatus;
 
     public DebugOverlay(LocationStatus locationStatus) {
 
@@ -37,14 +37,7 @@ public class DebugOverlay extends Overlay {
         drawTextLines(canvas, paint, 6, 251);
     }
 
-    void drawTextLines(Canvas canvas, Paint paint, int x, int y) {
-
-        /*
-        paint.setColor(Color.WHITE);
-        canvas.drawRect(0, 200, 500, 600, paint);
-        */
-
-        //paint.setColor(Color.BLACK);
+    private void drawTextLines(Canvas canvas, Paint paint, int x, int y) {
 
         String text;
 

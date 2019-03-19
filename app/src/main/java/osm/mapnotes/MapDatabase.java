@@ -1,14 +1,10 @@
 package osm.mapnotes;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -16,12 +12,9 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
-public class MapDatabase /* implements DatabaseErrorHandler */ {
+public class MapDatabase {
 
     private static final int DATABASE_VERSION=1;
 
@@ -40,55 +33,17 @@ public class MapDatabase /* implements DatabaseErrorHandler */ {
                     COL_LON+" REAL, "+
                     COL_TIME_STAMP+ " TEXT)";
 
-    /*
-    private class MapDbHelper extends SQLiteOpenHelper {
-
-        public MapDbHelper(Context context, String dbName) {
-            super(context, dbName, null, DATABASE_VERSION);
-        }
-
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(SQL_CREATE_TABLE_MARKERS);
-        }
-
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            // This database is only a cache for online data, so its upgrade policy is
-            // to simply to discard the data and start over
-            db.execSQL(SQL_DELETE_ENTRIES);
-            onCreate(db);
-            }
-    }
-    */
-
     SQLiteDatabase mDatabase=null;
 
-    //private String DATABASE_PATH;
-
     public String mLastErrorString=null;
-
-    //MapDbHelper mDbHelper=null;
 
     public MapDatabase() {
 
     }
 
-
-    //public boolean openOrCreate(Context context, String dbName) {
-
     public boolean openOrCreate(String databaseDir, String databaseName) {
 
         close();
-
-        /*
-        mDbHelper=new MapDbHelper(context, dbName);
-
-        SQLiteDatabase db=mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(COL_NAME, "nombre");
-
-        db.insert(TABLE_MARKERS, null, values);
-        */
 
         File dir=new File(databaseDir);
 
@@ -133,13 +88,6 @@ public class MapDatabase /* implements DatabaseErrorHandler */ {
 
     public void close() {
 
-        /*
-        if (mDbHelper!=null) {
-
-            mDbHelper.close();
-        }
-        */
-
         if (mDatabase!=null) {
 
             mDatabase.close();
@@ -154,7 +102,6 @@ public class MapDatabase /* implements DatabaseErrorHandler */ {
         ArrayList<MyMarker> markers=null;
 
         String table=TABLE_MARKERS;
-        //String[] tableColumns = new String[] {COL_ID, COL_NAME};
         String[] tableColumns=null;
         String whereClause=null;
         String[] whereArgs=null;
@@ -239,7 +186,6 @@ public class MapDatabase /* implements DatabaseErrorHandler */ {
         values.put(COL_NAME, marker.getTitle());
         values.put(COL_LAT, marker.getPosition().getLatitude());
         values.put(COL_LON, marker.getPosition().getLongitude());
-        //values.put(COL_TIME_STAMP, marker.getId());
 
         String whereClase=COL_TIME_STAMP+"=?";
 
@@ -292,11 +238,4 @@ public class MapDatabase /* implements DatabaseErrorHandler */ {
 
         return true;
     }
-
-    /*
-    @Override
-    public void onCorruption(SQLiteDatabase dbObj) {
-
-    }
-    */
 }

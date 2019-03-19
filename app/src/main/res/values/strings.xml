@@ -7,6 +7,7 @@
     <string name="database_path_">Database path:</string>
     <string name="delete">Delete</string>
     <string name="dialog_marker" translatable="false">Dialog_Marker</string>
+    <string name="found">Found</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>
@@ -16,9 +17,12 @@
     <string name="latitude_">Latitude:</string>
     <string name="longitude_">Longitude:</string>
     <string name="marker">Marker</string>
+    <string name="marker_added_">Marker added !!</string>
     <string name="marker_deleted_">Marker deleted !!</string>
     <string name="marker_name">Marker name</string>
     <string name="marker_name_">Marker name:</string>
+    <string name="marker_updated_">Marker updated !!</string>
+    <string name="markers">markers</string>
     <string name="preferences">Preferences</string>
     <string name="press_again_back">"Please again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
