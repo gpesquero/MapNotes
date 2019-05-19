@@ -109,6 +109,13 @@ public class MapDatabase {
         String having=null;
         String orderBy=null;
 
+        if (mDatabase==null) {
+
+            mLastErrorString="Error getMarkers(): mDatabase==null";
+
+            return null;
+        }
+
         try {
 
             Cursor cursor = mDatabase.query(table, tableColumns, whereClause, whereArgs, groupBy,
@@ -164,6 +171,13 @@ public class MapDatabase {
         values.put(COL_LON, marker.getPosition().getLongitude());
         values.put(COL_TIME_STAMP, marker.getId());
 
+        if (mDatabase==null) {
+
+            mLastErrorString="Error addMarker(): mDatabase==null";
+
+            return false;
+        }
+
         try {
 
             mDatabase.insertOrThrow(table, nullColumnHack, values);
@@ -191,6 +205,13 @@ public class MapDatabase {
 
         String[] whereArgs={marker.getId()};
 
+        if (mDatabase==null) {
+
+            mLastErrorString="Error updateMarker(): mDatabase==null";
+
+            return false;
+        }
+
         try {
 
             int rows=mDatabase.update(table, values, whereClase, whereArgs);
@@ -217,6 +238,13 @@ public class MapDatabase {
         String table=TABLE_MARKERS;
         String whereClause=COL_TIME_STAMP+"=?";
         String[] whereArgs={marker.getId()};
+
+        if (mDatabase==null) {
+
+            mLastErrorString="Error deleteMarker(): mDatabase==null";
+
+            return false;
+        }
 
         try {
 

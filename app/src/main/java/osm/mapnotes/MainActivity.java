@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     Drawable mMarkerIcon=null;
 
     private static int REQUEST_CODE_LOCATION = 0;
+    private static int REQUEST_CODE_EXTERNAL_STORAGE = 1;
 
     // Controls
 
@@ -107,18 +108,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         setContentView(R.layout.activity_main);
 
-        mMapView=(MapView)findViewById(R.id.map);
+        mMapView = (MapView) findViewById(R.id.map);
         setMapTileSource();
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
-        mImageViewLocation=(ImageView)findViewById(R.id.imageViewLocation);
+        mImageViewLocation = (ImageView) findViewById(R.id.imageViewLocation);
         mImageViewLocation.setOnClickListener(this);
 
-        mImageViewPreferences=(ImageView)findViewById(R.id.imageViewPreferences);
+        mImageViewPreferences = (ImageView) findViewById(R.id.imageViewPreferences);
         mImageViewPreferences.setOnClickListener(this);
 
-        mImageViewBookmark=(ImageView)findViewById(R.id.imageViewAddMarker);
+        mImageViewBookmark = (ImageView) findViewById(R.id.imageViewAddMarker);
         mImageViewBookmark.setOnClickListener(this);
 
         createLocationIcons(context);
@@ -165,68 +166,45 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mDebugOverlay = new DebugOverlay(mLocationStatus);
         mDebugOverlay.setEnabled(mPreferences.mShowDebugOverlay);
 
-        mItemOverlay=new ItemizedIconOverlay<OverlayItem>(mItems,
-                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+        mItemOverlay = new ItemizedIconOverlay<OverlayItem>(mItems,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
                         //do something
                         return true;
                     }
+
                     @Override
                     public boolean onItemLongPress(final int index, final OverlayItem item) {
                         return false;
                     }
                 }, this);
 
-        //mItemOverlay.setFocusItemsOnTap(true);
         mItemOverlay.setEnabled(true);
 
         mMapView.getOverlays().add(mItemOverlay);
 
-        mMarkerIcon=getResources().getDrawable(android.R.drawable.btn_star_big_on);
-
-        /*
-        Timer timer1sec = new Timer();
-        timer1sec.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(MainActivity.this);
-            }
-
-        }, 0, TIMEOUT_1_SEC);
-        */
-
-        //GnssStatus mGnssStatus=new GnssStatus();
-
+        mMarkerIcon = getResources().getDrawable(android.R.drawable.btn_star_big_on);
 
         updateLocationStatus();
 
-        //mDatabase=new MapDatabase();
-
-        //mDatabase.openOrCreate(this, "MapNotes.db");
-
-        /*
-        String path;
-
-        //SQLiteDatabase.CursorFactory factory=new SQLiteDatabase.CursorFactory();
-
-        SQLiteDatabase db=openOrCreateDatabase("Marcadores", MODE_PRIVATE, null);
-
-        if (db.isOpen()) {
-
-            if (!db.isReadOnly()) {
-
-                path=db.getPath();
-            }
-        }
-
-        db.execSQL("CREATE TABLE markers (id INTEGER PRIMARY KEY, name TEXT)");
-
-        db.close();
-        */
-
-
         mDatabase=new MapDatabase();
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            // We don't have writing permission for the external storage, so we have to request it...
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_EXTERNAL_STORAGE);
+
+        } else {
+
+            openMapDatabase();
+        }
+    }
+
+    private void openMapDatabase() {
 
         String text;
 
@@ -263,24 +241,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     }
 
-    /*
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-
-    }
-    */
-
-    /*
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-
-        mPreferences.saveState(getApplicationContext(), outState);
-
-        // call superclass to save any view hierarchy
-        super.onSaveInstanceState(outState);
-    }
-    */
-
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults) {
@@ -301,6 +261,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             mLocationStatus.setHasPermissions(true);
 
             requestLocationUpdates();
+
+        } else if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE) {
+
+            if ((grantResults.length==1) && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+
+                openMapDatabase();
+            }
         }
     }
 
@@ -309,9 +276,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         mLocationStatus.setProviderEnabled(
-
                 mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
-        //mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
         try {
 
@@ -348,10 +313,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             mDatabase.close();
             mDatabase=null;
         }
-
-        //Toast.makeText(this, "onDestroy()", Toast.LENGTH_LONG).show();
-
-
     }
 
     @Override
@@ -387,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             mTick = true;
         }
-
     }
 
     @Override
@@ -510,58 +470,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 return;
 
             GeoPoint centerPoint = new GeoPoint(mLocation.getLatitude(), mLocation.getLongitude());
-            //mMapController.setCenter(centerPoint);
+
             mMapController.animateTo(centerPoint);
 
         } else if (view == mImageViewPreferences) {
 
             Intent intent = new Intent(this, PreferencesActivity.class);
-            //EditText editText = (EditText) findViewById(R.id.editText);
-            //String message = editText.getText().toString();
-            //intent.putExtra(EXTRA_MESSAGE, message);
 
             startActivity(intent);
         }
         else if (view == mImageViewBookmark) {
 
-            /*
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-
-            Fragment prev = getFragmentManager().findFragmentByTag(getString(R.string.dialog_marker));
-
-            if (prev != null) {
-                ft.remove(prev);
-            }
-
-            ft.addToBackStack(null);
-            */
-
             GeoPoint center=(GeoPoint)mMapView.getMapCenter();
 
-            /*
-            OverlayItem item=new OverlayItem("Title", "Snippet", center);
-            item.setMarker(icon);
-
-            mItemOverlay.addItem(item);
-
-            mMapView.invalidate();
-            */
-
-            /*
-            MyMarker marker=new MyMarker(mMapView, this);
-            marker.setPosition(center);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-            marker.setIcon(mMarkerIcon);
-            marker.setDraggable(false);
-            marker.setTitle("");
-            marker.setId(timeStamp);
-            */
-
             MarkerDialogFragment fragment=new MarkerDialogFragment();
-            //fragment.setMarker(marker);
-            //fragment.setNewMarker(true);
-
-            //fragment.setOnDismissListener(this);
 
             fragment.mIsNewMarker=true;
             fragment.mLon=center.getLongitude();
@@ -571,22 +493,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Date d=new Date(System.currentTimeMillis());
             fragment.mTimeStamp=d.toString();
 
-
-
-
-            //bm.setPosition(center);
-            //bm.setName("Hello");
-
-            //mBookMarks.add(bm);
-
-            /*
-            Bundle args=new Bundle();
-            args.putDouble(getString(R.string.key_lat), center.getLatitude());
-            args.putDouble(getString(R.string.key_lon), center.getLongitude());
-
-            fragment.setArguments(args);
-            */
-
             fragment.show(getSupportFragmentManager(), getString(R.string.dialog_marker));
         }
     }
@@ -595,12 +501,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onPause() {
         super.onPause();
 
-        //mDebugOverlay.enable(mPreferences.mShowDebugOverlay);
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().save(this, prefs);
-
-        //mDebugOverlay.onPause();
 
         mMapView.onPause();
     }
@@ -613,33 +515,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         setMapTileSource();
 
-        /*
-        if (mPreferences.mShowDebugOverlay) {
-
-            if (!mMapView.getOverlays().contains(mDebugOverlay)) {
-
-                mMapView.getOverlays().add(mDebugOverlay);
-            }
-        }
-        else {
-
-            if (mMapView.getOverlays().contains(mDebugOverlay)) {
-
-                mMapView.getOverlays().remove(mDebugOverlay);
-            }
-        }
-
-        mDebugOverlay.onResume();
-        */
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
 
         mMapView.onResume();
-
-        //mMapView.invalidate();
-
-        //mMapController.setZoom(mMapView.getZoomLevelDouble());
     }
 
     void setMapTileSource() {
@@ -828,8 +707,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (overlays.contains(marker)) {
 
             MarkerDialogFragment fragment=new MarkerDialogFragment();
-            //fragment.setMarker(marker);
-            //fragment.setNewMarker(false);
 
             fragment.mIsNewMarker=false;
             fragment.mLon=marker.getPosition().getLongitude();
@@ -838,19 +715,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             fragment.mTimeStamp=marker.getId();
 
             fragment.show(getSupportFragmentManager(), getString(R.string.dialog_marker));
-
-
-            //overlays.remove(marker);
         }
-
     }
-
-    /*
-    @Override
-    public void onHideSoftInput() {
-
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-    }
-    */
 }

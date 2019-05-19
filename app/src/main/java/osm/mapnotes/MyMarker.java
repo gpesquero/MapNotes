@@ -29,7 +29,6 @@ public class MyMarker extends Marker {
         if (touched) {
 
             mListener.onLongPress(this);
-
         }
 
         return touched;

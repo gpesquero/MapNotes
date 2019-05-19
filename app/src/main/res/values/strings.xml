@@ -24,7 +24,7 @@
     <string name="marker_updated_">Marker updated !!</string>
     <string name="markers">markers</string>
     <string name="preferences">Preferences</string>
-    <string name="press_again_back">"Please again 'Back' to exit..."</string>
+    <string name="press_again_back">"Press again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
     <string name="tile_source">Tile Source:</string>
     <string name="time_stamp_">Time Stamp:</string>
