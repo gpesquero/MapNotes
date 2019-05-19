@@ -1,13 +1,12 @@
 <resources>
 
     <string name="app_name" translatable="false">MapNotes</string>
-    <string name="are_you_sure">Are you sure?</string>
+    <string name="are_you_sure_that_you_want_to_delete_marker">Are you sure that you want to delete marker?</string>
     <string name="coordinates_">Coordinates:</string>
     <string name="database_name" translatable="false">MapNotes.db</string>
     <string name="database_path_">Database path:</string>
     <string name="delete">Delete</string>
     <string name="dialog_marker" translatable="false">Dialog_Marker</string>
-    <string name="found">Found</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>
@@ -15,6 +14,7 @@
     <string name="key_tile_source" translatable="false">Tile_Source</string>
     <string name="key_zoom" translatable="false">Key_Zoom</string>
     <string name="latitude_">Latitude:</string>
+    <string name="loaded">Loaded</string>
     <string name="longitude_">Longitude:</string>
     <string name="marker">Marker</string>
     <string name="marker_added_">Marker added !!</string>

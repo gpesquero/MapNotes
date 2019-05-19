@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -245,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                 // Map database is ok...
 
-                text=getString(R.string.found)+" "+markers.size()+" "+getString(R.string.markers)+"...";
+                text=getString(R.string.loaded)+" "+markers.size()+" "+getString(R.string.markers)+"...";
 
                 Iterator<MyMarker> iter=markers.iterator();
 
@@ -586,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             fragment.setArguments(args);
             */
 
-            fragment.show(getFragmentManager(), getString(R.string.dialog_marker));
+            fragment.show(getSupportFragmentManager(), getString(R.string.dialog_marker));
         }
     }
 
@@ -836,7 +837,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             fragment.mName=marker.getTitle();
             fragment.mTimeStamp=marker.getId();
 
-            fragment.show(getFragmentManager(), getString(R.string.dialog_marker));
+            fragment.show(getSupportFragmentManager(), getString(R.string.dialog_marker));
 
 
             //overlays.remove(marker);

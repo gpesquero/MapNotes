@@ -5,14 +5,16 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MarkerDialogFragment extends DialogFragment implements View.OnClickListener,
+public class MarkerDialogFragment extends AppCompatDialogFragment implements View.OnClickListener,
         DialogInterface.OnClickListener {
 
     // Controls
@@ -134,6 +136,11 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
             markerDataBundle.putString(KEY_NAME, mName);
             markerDataBundle.putString(KEY_TIME_STAMP, mTimeStamp);
 
+            if (mListener==null) {
+
+                Toast.makeText(mContext, "ERROR: mListener==null", Toast.LENGTH_LONG).show();
+            }
+
             if (mIsNewMarker) {
 
                 mListener.onNewMarker(markerDataBundle);
@@ -149,7 +156,8 @@ public class MarkerDialogFragment extends DialogFragment implements View.OnClick
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-            builder.setMessage(R.string.are_you_sure).setNegativeButton(android.R.string.cancel, this)
+            builder.setMessage(R.string.are_you_sure_that_you_want_to_delete_marker)
+                    .setNegativeButton(android.R.string.cancel, this)
                     .setPositiveButton(R.string.delete, this).show();
         }
     }
