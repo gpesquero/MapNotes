@@ -30,6 +30,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
@@ -110,8 +111,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mMapView = (MapView) findViewById(R.id.map);
         setMapTileSource();
-        mMapView.setBuiltInZoomControls(true);
+        //mMapView.setBuiltInZoomControls(true);
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
         mMapView.setMultiTouchControls(true);
+        //mMapView.setTilesScaledToDpi(true);
 
         mImageViewLocation = (ImageView) findViewById(R.id.imageViewLocation);
         mImageViewLocation.setOnClickListener(this);
@@ -160,7 +163,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mCompassOverlay.enableCompass();
         mMapView.getOverlays().add(this.mCompassOverlay);
 
-        mCrossHairOverlay = new CrossHairOverlay();
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.osm_ic_center_map);
+
+        mCrossHairOverlay = new CrossHairOverlay(bitmap);
         mMapView.getOverlays().add(mCrossHairOverlay);
 
         mDebugOverlay = new DebugOverlay(mLocationStatus);
@@ -552,6 +557,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 tileSource=TileSourceFactory.MAPNIK;
                 break;
         }
+
+        String userAgent=BuildConfig.APPLICATION_ID;
+
+        Configuration.getInstance().setUserAgentValue(userAgent);
+
+        //"github-gpesquero-mapnotes/1.0");
 
         mMapView.setTileSource(tileSource);
     }

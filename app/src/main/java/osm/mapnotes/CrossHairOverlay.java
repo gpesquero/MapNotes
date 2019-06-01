@@ -1,5 +1,6 @@
 package osm.mapnotes;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,10 +10,19 @@ import org.osmdroid.views.overlay.Overlay;
 
 public class CrossHairOverlay extends Overlay {
 
+    Bitmap mBitmap;
+
+    CrossHairOverlay(Bitmap bitmap) {
+
+        mBitmap=bitmap;
+    }
+
     @Override
     public void draw(Canvas canvas, MapView map, boolean shadow) {
 
-        float CROSS_HAIR_SIZE=20;
+        float CROSS_HAIR_SIZE=30;
+        float BIG_STROKE_WIDTH=15;
+        float SMALL_STROKE_WIDTH=5;
 
         if (shadow) {
             return;
@@ -23,7 +33,9 @@ public class CrossHairOverlay extends Overlay {
 
         Paint paint=new Paint();
         paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(BIG_STROKE_WIDTH);
+
+        //canvas.drawBitmap(mBitmap, 0, 0, paint);
 
         canvas.drawLine(centerX-CROSS_HAIR_SIZE, centerY,
                 centerX+CROSS_HAIR_SIZE, centerY, paint);
@@ -32,7 +44,7 @@ public class CrossHairOverlay extends Overlay {
                 centerX, centerY+CROSS_HAIR_SIZE, paint);
 
         paint.setColor(Color.BLACK);
-        paint.setStrokeWidth(3);
+        paint.setStrokeWidth(SMALL_STROKE_WIDTH);
 
         canvas.drawLine(centerX-CROSS_HAIR_SIZE, centerY,
                 centerX+CROSS_HAIR_SIZE, centerY, paint);

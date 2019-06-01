@@ -21,6 +21,7 @@
     <string name="marker_deleted_">Marker deleted !!</string>
     <string name="marker_name">Marker name</string>
     <string name="marker_name_">Marker name:</string>
+    <string name="marker_name_is_empty_">Marker name is empty !!</string>
     <string name="marker_updated_">Marker updated !!</string>
     <string name="markers">markers</string>
     <string name="preferences">Preferences</string>

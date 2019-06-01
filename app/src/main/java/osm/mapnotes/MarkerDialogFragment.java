@@ -127,7 +127,14 @@ public class MarkerDialogFragment extends AppCompatDialogFragment implements Vie
 
         if (view==mImageButtonOk) {
 
-            mName=mEditTextName.getText().toString();
+            mName=mEditTextName.getText().toString().trim();
+
+            if (mName.isEmpty()) {
+
+                Toast.makeText(mContext, R.string.marker_name_is_empty_, Toast.LENGTH_SHORT).show();
+
+                return;
+            }
 
             Bundle markerDataBundle=new Bundle();
 

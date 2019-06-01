@@ -13,6 +13,7 @@
     <string name="marker_deleted_">¡¡ Marcador borrado !!</string>
     <string name="marker_name">Nombre del marcador</string>
     <string name="marker_name_">Nombre del marcador:</string>
+    <string name="marker_name_is_empty_">¡¡ El nombre del marcador está vacío !!</string>
     <string name="marker_updated_">¡¡ Marcador actualizado !!</string>
     <string name="markers">marcadores</string>
     <string name="preferences">Preferencias</string>
