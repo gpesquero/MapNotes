@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="are_you_sure_that_you_want_to_clear_tile_cache">¿Está seguro que quiere limpiar la caché de teselas?</string>
     <string name="are_you_sure_that_you_want_to_delete_marker">¿Está seguro que quiere borrar el marcador?</string>
+    <string name="clear">Limpiar</string>
+    <string name="clear_tile_cache">Limpiar caché de teselas</string>
     <string name="coordinates_">Coordenadas:</string>
     <string name="database_path_">Path Base de Datos:</string>
     <string name="delete">Borrar</string>

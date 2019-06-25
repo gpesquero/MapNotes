@@ -1,6 +1,10 @@
 package osm.mapnotes;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 
 import android.support.v7.app.AppCompatActivity;
@@ -8,13 +12,16 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-public class PreferencesActivity extends AppCompatActivity {
+public class PreferencesActivity extends AppCompatActivity implements View.OnClickListener,
+        DialogInterface.OnClickListener {
 
     CheckBox mCheckBoxShowDebugOverlay;
 
     RadioGroup mRadioGroupTileSource;
 
     TextView mTextViewDatabasePath;
+
+    Button mButtonClearTileCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +42,9 @@ public class PreferencesActivity extends AppCompatActivity {
         String fullPath=MainActivity.mPreferences.mDatabaseDir+
                 MainActivity.mPreferences.mDatabaseName;
         mTextViewDatabasePath.setText(fullPath);
+
+        mButtonClearTileCache = (Button) findViewById(R.id.buttonClearTileCache);
+        mButtonClearTileCache.setOnClickListener(this);
     }
 
     @Override
@@ -52,6 +62,30 @@ public class PreferencesActivity extends AppCompatActivity {
 
             RadioButton radioButton=findViewById(id);
             MainActivity.mPreferences.mTileSource=mRadioGroupTileSource.indexOfChild(radioButton)-1;
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        if (view==mButtonClearTileCache) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setMessage(R.string.are_you_sure_that_you_want_to_clear_tile_cache)
+                    .setNegativeButton(android.R.string.cancel, this)
+                    .setPositiveButton(R.string.clear, this).show();
+        }
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        if (which==DialogInterface.BUTTON_POSITIVE) {
+
+            MainActivity parentActivity=(MainActivity)getParent();
+
+            parentActivity.clearTileCache();
         }
     }
 }

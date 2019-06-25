@@ -1,7 +1,10 @@
 <resources>
 
     <string name="app_name" translatable="false">MapNotes</string>
+    <string name="are_you_sure_that_you_want_to_clear_tile_cache">Are you sure that you want to clear the tile cache?</string>
     <string name="are_you_sure_that_you_want_to_delete_marker">Are you sure that you want to delete marker?</string>
+    <string name="clear">Clear</string>
+    <string name="clear_tile_cache">Clear Tile Cache</string>
     <string name="coordinates_">Coordinates:</string>
     <string name="database_name" translatable="false">MapNotes.db</string>
     <string name="database_path_">Database path:</string>

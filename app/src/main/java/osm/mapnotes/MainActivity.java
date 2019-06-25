@@ -728,4 +728,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             fragment.show(getSupportFragmentManager(), getString(R.string.dialog_marker));
         }
     }
+
+    public void clearTileCache() {
+
+        mMapView.getTileProvider().clearTileCache();
+    }
 }
