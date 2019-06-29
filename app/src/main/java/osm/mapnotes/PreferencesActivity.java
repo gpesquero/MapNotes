@@ -23,6 +23,8 @@ public class PreferencesActivity extends AppCompatActivity implements View.OnCli
 
     Button mButtonClearTileCache;
 
+    static int RESULT_CLEAR_TILE_CACHE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +45,7 @@ public class PreferencesActivity extends AppCompatActivity implements View.OnCli
                 MainActivity.mPreferences.mDatabaseName;
         mTextViewDatabasePath.setText(fullPath);
 
-        mButtonClearTileCache = (Button) findViewById(R.id.buttonClearTileCache);
+        mButtonClearTileCache=findViewById(R.id.buttonClearTileCache);
         mButtonClearTileCache.setOnClickListener(this);
     }
 
@@ -83,9 +85,9 @@ public class PreferencesActivity extends AppCompatActivity implements View.OnCli
 
         if (which==DialogInterface.BUTTON_POSITIVE) {
 
-            MainActivity parentActivity=(MainActivity)getParent();
+            setResult(RESULT_CLEAR_TILE_CACHE);
 
-            parentActivity.clearTileCache();
+            finish();
         }
     }
 }

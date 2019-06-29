@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private static int REQUEST_CODE_LOCATION = 0;
     private static int REQUEST_CODE_EXTERNAL_STORAGE = 1;
+    private static int REQUEST_CODE_PREFERENCES = 2;
 
     // Controls
 
@@ -381,11 +382,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 break;
         }
 
+        /*
         int sats=(int)bundle.get("satellites");
 
         text += ", Sats: " + sats;
 
-        //Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        */
 
         updateLocationStatus();
     }
@@ -482,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             Intent intent = new Intent(this, PreferencesActivity.class);
 
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_CODE_PREFERENCES);
         }
         else if (view == mImageViewBookmark) {
 
@@ -729,8 +732,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode==REQUEST_CODE_PREFERENCES) {
+
+            if (resultCode==PreferencesActivity.RESULT_CLEAR_TILE_CACHE) {
+
+                clearTileCache();
+            }
+        }
+    }
+
     public void clearTileCache() {
 
         mMapView.getTileProvider().clearTileCache();
+
+        Toast.makeText(this, R.string.tile_cache_cleared, Toast.LENGTH_LONG).show();
     }
 }
