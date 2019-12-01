@@ -9,7 +9,11 @@
     <string name="database_name" translatable="false">MapNotes.db</string>
     <string name="database_path_">Database path:</string>
     <string name="delete">Delete</string>
+    <string name="dialog_go_to" translatable="false">Dialog_Go_To</string>
     <string name="dialog_marker" translatable="false">Dialog_Marker</string>
+    <string name="go_to_">Go to...</string>
+    <string name="go_to_newest_marker">Go to newest marker</string>
+    <string name="go_to_oldest_marker">Go to oldest marker</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>

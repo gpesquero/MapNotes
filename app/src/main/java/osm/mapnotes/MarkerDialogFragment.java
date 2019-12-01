@@ -67,7 +67,7 @@ public class MarkerDialogFragment extends AppCompatDialogFragment implements Vie
         catch (final ClassCastException e) {
 
             throw new ClassCastException(context.toString() +
-                    " must implement OnBookMarkDialogListener");
+                    " must implement OnMarkerDialogListener");
         }
     }
 
@@ -146,6 +146,8 @@ public class MarkerDialogFragment extends AppCompatDialogFragment implements Vie
             if (mListener==null) {
 
                 Toast.makeText(mContext, "ERROR: mListener==null", Toast.LENGTH_LONG).show();
+
+                return;
             }
 
             if (mIsNewMarker) {

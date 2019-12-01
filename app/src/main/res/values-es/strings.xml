@@ -8,6 +8,9 @@
     <string name="coordinates_">Coordenadas:</string>
     <string name="database_path_">Path Base de Datos:</string>
     <string name="delete">Borrar</string>
+    <string name="go_to_">Ir a...</string>
+    <string name="go_to_newest_marker">Ir al marcador más nuevo</string>
+    <string name="go_to_oldest_marker">Ir al marcador más antiguo</string>
     <string name="latitude_">Latitud:</string>
     <string name="loaded">Cargados</string>
     <string name="longitude_">Longitud:</string>

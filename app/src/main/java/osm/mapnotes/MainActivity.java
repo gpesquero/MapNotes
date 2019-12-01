@@ -31,6 +31,7 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
@@ -41,14 +42,17 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, Runnable,
         View.OnClickListener, MarkerDialogFragment.OnMarkerDialogListener,
-        MyMarker.OnMyMarkerListener {
+        MyMarker.OnMyMarkerListener, GoToDialogFragment.OnGoToDialogListener {
 
     // OsmDroid objects
 
@@ -91,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     ImageView mImageViewLocation = null;
     ImageView mImageViewPreferences = null;
     ImageView mImageViewBookmark= null;
+    ImageView mImageViewGoTo= null;
 
     private boolean mTick = true;
 
@@ -125,6 +130,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mImageViewBookmark = (ImageView) findViewById(R.id.imageViewAddMarker);
         mImageViewBookmark.setOnClickListener(this);
+
+        mImageViewGoTo = (ImageView) findViewById(R.id.imageViewGoTo);
+        mImageViewGoTo.setOnClickListener(this);
 
         createLocationIcons(context);
 
@@ -499,9 +507,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             fragment.mName="";
 
             Date d=new Date(System.currentTimeMillis());
-            fragment.mTimeStamp=d.toString();
+            //fragment.mTimeStamp=d.toString();
+
+            DateFormat df=DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.ENGLISH);
+            fragment.mTimeStamp=df.format(d);
 
             fragment.show(getSupportFragmentManager(), getString(R.string.dialog_marker));
+        }
+        else if (view == mImageViewGoTo) {
+
+            GoToDialogFragment fragment=new GoToDialogFragment();
+
+            fragment.show(getSupportFragmentManager(), getString(R.string.dialog_go_to));
         }
     }
 
@@ -749,4 +766,116 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         Toast.makeText(this, R.string.tile_cache_cleared, Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onGoToOldestMarker() {
+
+        goToMarker(true);
+    }
+
+    @Override
+    public void onGoToNewestMarker() {
+
+        goToMarker(false);
+    }
+
+    private void goToMarker(boolean oldest) {
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        MyMarker selMarker=null;
+        Date selDate=null;
+
+        DateFormat df=DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG,
+                Locale.ENGLISH);
+
+        Iterator<Overlay> iterator=overlays.iterator();
+
+        while(iterator.hasNext()) {
+
+            Overlay overlay=iterator.next();
+
+            if (overlay instanceof MyMarker) {
+
+                MyMarker marker=(MyMarker) overlay;
+
+                if (selMarker==null) {
+
+                    selMarker=marker;
+
+                    try {
+                        selDate=df.parse(selMarker.getId());
+
+                    } catch (ParseException e) {
+
+                        selDate=null;
+
+                        Toast.makeText(this, "DateTime parse error", Toast.LENGTH_LONG).show();
+
+                        mMapController.animateTo(selMarker.getPosition());
+
+                        return;
+                    }
+                }
+                else {
+
+                    String id=marker.getId();
+
+                    Date date=null;
+
+                    try {
+                        date=df.parse(id);
+
+                    } catch (ParseException e) {
+
+                        date=null;
+
+                        Toast.makeText(this, "DateTime parse error", Toast.LENGTH_LONG).show();
+
+                        mMapController.animateTo(marker.getPosition());
+
+                        return;
+                    }
+
+                    if ((selDate==null) || (date==null)) {
+
+                        Toast.makeText(this, "Dates are null", Toast.LENGTH_LONG).show();
+
+                        return;
+                    }
+
+                    if (oldest) {
+
+                        if (date.before(selDate)) {
+
+                            selMarker=marker;
+                            selDate=date;
+                        }
+                    }
+                    else {
+
+                        if (date.after(selDate)) {
+
+                            selMarker = marker;
+                            selDate = date;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (selMarker==null) {
+
+            Toast.makeText(this, "There are no markers", Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        Toast.makeText(this, "Go to Marker: "+selMarker.getTitle(),
+                    Toast.LENGTH_LONG).show();
+
+        mMapController.animateTo(selMarker.getPosition());
+    }
+
+
 }
