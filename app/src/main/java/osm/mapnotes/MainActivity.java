@@ -252,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
 
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-
     }
 
     public void onRequestPermissionsResult(int requestCode,
@@ -866,16 +865,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (selMarker==null) {
 
-            Toast.makeText(this, "There are no markers", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.there_are_no_markers, Toast.LENGTH_LONG).show();
 
             return;
         }
 
-        Toast.makeText(this, "Go to Marker: "+selMarker.getTitle(),
+        Toast.makeText(this, R.string.go_to_marker_+selMarker.getTitle(),
                     Toast.LENGTH_LONG).show();
 
         mMapController.animateTo(selMarker.getPosition());
     }
-
-
 }
