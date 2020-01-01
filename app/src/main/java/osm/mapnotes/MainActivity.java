@@ -18,20 +18,23 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.DelayedMapListener;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
@@ -42,8 +45,10 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -84,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     MapDatabase mDatabase=null;
 
+    ErrorsDatabase mErrorsDataBase=null;
+
     Drawable mMarkerIcon=null;
 
     private static int REQUEST_CODE_LOCATION = 0;
@@ -95,7 +102,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     ImageView mImageViewLocation = null;
     ImageView mImageViewPreferences = null;
     ImageView mImageViewBookmark= null;
-    ImageView mImageViewGoTo= null;
+    ImageView mImageViewGoTo = null;
+    ImageView mImageViewTest = null;
+
+    TextView mTextViewLog = null;
 
     private boolean mTick = true;
 
@@ -121,6 +131,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
         mMapView.setMultiTouchControls(true);
         //mMapView.setTilesScaledToDpi(true);
+        //mMapView.addMapListener(this);
+
+        final int MAP_LISTENER_DELAY = 500;
+
+        // If there is more than 200 millisecs no zoom/scroll update markers
+        mMapView.addMapListener(new DelayedMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+
+                Toast.makeText(getBaseContext(), "onScroll", Toast.LENGTH_SHORT).show();
+
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+
+                Toast.makeText(getBaseContext(), "onZoom", Toast.LENGTH_SHORT).show();
+
+                return false;
+            }
+        }, MAP_LISTENER_DELAY));
 
         mImageViewLocation = (ImageView) findViewById(R.id.imageViewLocation);
         mImageViewLocation.setOnClickListener(this);
@@ -133,6 +165,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mImageViewGoTo = (ImageView) findViewById(R.id.imageViewGoTo);
         mImageViewGoTo.setOnClickListener(this);
+
+        mImageViewTest = (ImageView) findViewById(R.id.imageViewTest);
+        mImageViewTest.setOnClickListener(this);
+
+        mTextViewLog = (TextView) findViewById(R.id.textViewLog);
 
         createLocationIcons(context);
 
@@ -215,6 +252,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         } else {
 
             openMapDatabase();
+
+            openErrorDatabase();
         }
     }
 
@@ -254,6 +293,71 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
+    private void openErrorDatabase() {
+
+        File[] externalDirs = getExternalFilesDirs(null);
+
+        if (externalDirs==null) {
+
+            Toast.makeText(this, "No external dirs found!!", Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        String fileName=null;
+
+        for (File dir : externalDirs) {
+
+            fileName=dir.getAbsolutePath();
+
+            int pos=fileName.indexOf("Android/data");
+
+            if (pos>=0) {
+
+                fileName=fileName.substring(0, pos);
+            }
+
+            fileName+="MapNotes/keepright_errors.db";
+
+            File dbFile=new File(fileName);
+
+            if (dbFile.exists()) {
+
+                break;
+            }
+            else {
+
+                fileName=null;
+            }
+        }
+
+        String text;
+
+        if (fileName==null) {
+
+            text="No 'keepright_errors.db' file found!!";
+        }
+        else {
+
+            mErrorsDataBase=new ErrorsDatabase();
+
+            if (!mErrorsDataBase.openDatabase(fileName)) {
+
+                text="Error opening 'keepright_errors.db':" +mErrorsDataBase.mLastErrorString;
+
+                mErrorsDataBase.close();
+            }
+            else {
+
+                text="Database 'keepright_error.db' opened Ok!";
+            }
+        }
+
+        mTextViewLog.setText(text);
+
+        //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults) {
@@ -280,6 +384,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             if ((grantResults.length==1) && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
 
                 openMapDatabase();
+
+                openErrorDatabase();
             }
         }
     }
@@ -518,6 +624,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             GoToDialogFragment fragment=new GoToDialogFragment();
 
             fragment.show(getSupportFragmentManager(), getString(R.string.dialog_go_to));
+        }
+        else if (view == mImageViewTest) {
+
+            testErrorsDatabase();
         }
     }
 
@@ -874,5 +984,49 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     Toast.LENGTH_LONG).show();
 
         mMapController.animateTo(selMarker.getPosition());
+    }
+
+    /*
+    @Override
+    public boolean onScroll(ScrollEvent event) {
+
+        Toast.makeText(this, "onScroll", Toast.LENGTH_SHORT).show();
+
+        return true;
+    }
+
+    @Override
+    public boolean onZoom(ZoomEvent event) {
+
+        Toast.makeText(this, "onZoom", Toast.LENGTH_SHORT).show();
+
+        return true;
+    }
+    */
+
+    private void testErrorsDatabase() {
+
+        String text;
+
+        if (mErrorsDataBase==null) {
+
+            text="mErrorsDataBase==null";
+        }
+        else {
+
+            long start=System.currentTimeMillis();
+
+            long count=mErrorsDataBase.getNumberOfErrors();
+
+            //long elapsedTime=System.currentTimeMillis()-start;
+
+            double elapsedTime=((double)System.currentTimeMillis()-start)/1000.0;
+
+            text=String.format("mErrorsDataBase has %d rows (%.1f sec)", count, elapsedTime);
+        }
+
+        mTextViewLog.setText(text);
+
+        //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 }
