@@ -33,6 +33,7 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
@@ -45,10 +46,8 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -57,7 +56,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LocationListener, Runnable,
         View.OnClickListener, MarkerDialogFragment.OnMarkerDialogListener,
-        MyMarker.OnMyMarkerListener, GoToDialogFragment.OnGoToDialogListener {
+        MyMarker.OnMyMarkerListener, GoToDialogFragment.OnGoToDialogListener,
+        KeepRightErrorsManager.KeepRightErrorsManagerListener {
 
     // OsmDroid objects
 
@@ -71,9 +71,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     CrossHairOverlay mCrossHairOverlay = null;
     DebugOverlay mDebugOverlay = null;
 
-    ItemizedIconOverlay mItemOverlay=null;
+    ItemizedIconOverlay mMarkersOverlay=null;
 
-    ArrayList<OverlayItem> mItems=new ArrayList<OverlayItem>();
+    ItemizedIconOverlay mErrorsOverlay=null;
+
+    ArrayList<OverlayItem> mMarkerItems=new ArrayList<OverlayItem>();
+
+    ArrayList<OverlayItem> mErrorItems=new ArrayList<OverlayItem>();
 
     private long mPreviousCancelTime = 0;
 
@@ -89,13 +93,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     MapDatabase mDatabase=null;
 
-    ErrorsDatabase mErrorsDataBase=null;
+    KeepRightErrorsManager mErrorsManager=null;
 
     Drawable mMarkerIcon=null;
 
     private static int REQUEST_CODE_LOCATION = 0;
     private static int REQUEST_CODE_EXTERNAL_STORAGE = 1;
     private static int REQUEST_CODE_PREFERENCES = 2;
+
+    int mZoomLevel=0;
 
     // Controls
 
@@ -105,7 +111,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     ImageView mImageViewGoTo = null;
     ImageView mImageViewTest = null;
 
-    TextView mTextViewLog = null;
+    TextView mTextViewLog1 = null;
+    TextView mTextViewLog2 = null;
 
     private boolean mTick = true;
 
@@ -140,7 +147,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             @Override
             public boolean onScroll(ScrollEvent event) {
 
-                Toast.makeText(getBaseContext(), "onScroll", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), "onScroll", Toast.LENGTH_SHORT).show();
+
+                onScrollZoomChange();
 
                 return false;
             }
@@ -148,7 +157,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             @Override
             public boolean onZoom(ZoomEvent event) {
 
-                Toast.makeText(getBaseContext(), "onZoom", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), "onZoom", Toast.LENGTH_SHORT).show();
+
+                onScrollZoomChange();
 
                 return false;
             }
@@ -169,7 +180,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mImageViewTest = (ImageView) findViewById(R.id.imageViewTest);
         mImageViewTest.setOnClickListener(this);
 
-        mTextViewLog = (TextView) findViewById(R.id.textViewLog);
+        mTextViewLog1 = (TextView) findViewById(R.id.textViewLog1);
+        mTextViewLog2 = (TextView) findViewById(R.id.textViewLog2);
 
         createLocationIcons(context);
 
@@ -217,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mDebugOverlay = new DebugOverlay(mLocationStatus);
         mDebugOverlay.setEnabled(mPreferences.mShowDebugOverlay);
 
-        mItemOverlay = new ItemizedIconOverlay<OverlayItem>(mItems,
+        mMarkersOverlay = new ItemizedIconOverlay<OverlayItem>(mMarkerItems,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
@@ -231,15 +243,41 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     }
                 }, this);
 
-        mItemOverlay.setEnabled(true);
+        mMarkersOverlay.setEnabled(true);
 
-        mMapView.getOverlays().add(mItemOverlay);
+        mMapView.getOverlays().add(mMarkersOverlay);
 
         mMarkerIcon = getResources().getDrawable(android.R.drawable.btn_star_big_on);
+
+        mErrorsOverlay = new ItemizedIconOverlay<OverlayItem>(mErrorItems,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        //do something
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                }, this);
+
+        mErrorsOverlay.setEnabled(true);
+
+        mMapView.getOverlays().add(mErrorsOverlay);
 
         updateLocationStatus();
 
         mDatabase=new MapDatabase();
+
+        if (mPreferences.mShowErrors) {
+            mErrorsManager = new KeepRightErrorsManager(this, mMapView);
+        }
+        else {
+
+            mErrorsManager=null;
+        }
 
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -254,6 +292,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             openMapDatabase();
 
             openErrorDatabase();
+        }
+
+        if (mPreferences.mShowDebugOverlay) {
+
+            mTextViewLog1.setVisibility(View.VISIBLE);
+            mTextViewLog2.setVisibility(View.VISIBLE);
+        }
+        else {
+
+            mTextViewLog1.setVisibility(View.INVISIBLE);
+            mTextViewLog2.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -295,67 +344,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void openErrorDatabase() {
 
-        File[] externalDirs = getExternalFilesDirs(null);
-
-        if (externalDirs==null) {
-
-            Toast.makeText(this, "No external dirs found!!", Toast.LENGTH_LONG).show();
-
+        if (mErrorsManager==null) {
             return;
         }
 
-        String fileName=null;
+        String msgString;
 
-        for (File dir : externalDirs) {
+        mErrorsManager.openErrorDatabase(this);
 
-            fileName=dir.getAbsolutePath();
+        msgString=mErrorsManager.mLastErrorString;
 
-            int pos=fileName.indexOf("Android/data");
+        if (mPreferences.mShowDebugOverlay) {
 
-            if (pos>=0) {
-
-                fileName=fileName.substring(0, pos);
-            }
-
-            fileName+="MapNotes/keepright_errors.db";
-
-            File dbFile=new File(fileName);
-
-            if (dbFile.exists()) {
-
-                break;
-            }
-            else {
-
-                fileName=null;
-            }
-        }
-
-        String text;
-
-        if (fileName==null) {
-
-            text="No 'keepright_errors.db' file found!!";
+            mTextViewLog1.setText(msgString);
         }
         else {
 
-            mErrorsDataBase=new ErrorsDatabase();
-
-            if (!mErrorsDataBase.openDatabase(fileName)) {
-
-                text="Error opening 'keepright_errors.db':" +mErrorsDataBase.mLastErrorString;
-
-                mErrorsDataBase.close();
-            }
-            else {
-
-                text="Database 'keepright_error.db' opened Ok!";
-            }
+            mTextViewLog1.setVisibility(View.INVISIBLE);
+            mTextViewLog2.setVisibility(View.INVISIBLE);
         }
-
-        mTextViewLog.setText(text);
-
-        //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
     public void onRequestPermissionsResult(int requestCode,
@@ -986,6 +993,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mMapController.animateTo(selMarker.getPosition());
     }
 
+    private void onScrollZoomChange() {
+
+        if (mErrorsManager==null) {
+
+            return;
+        }
+
+        mZoomLevel=(int)Math.round(mMapView.getZoomLevelDouble());
+
+        if (mZoomLevel<16) {
+
+            mErrorsOverlay.setEnabled(false);
+
+            reportCacheData("");
+        }
+        else {
+
+            mErrorsOverlay.setEnabled(true);
+
+            BoundingBox mapBounds=mMapView.getBoundingBox();
+
+            mErrorsManager.getErrors(mapBounds);
+        }
+
+        //mTextViewLog.setText("Zoom: "+zoom);
+    }
+
     /*
     @Override
     public boolean onScroll(ScrollEvent event) {
@@ -1006,27 +1040,46 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void testErrorsDatabase() {
 
-        String text;
+        //mErrorsDataBaseManager.getNumberOfErrors();
+    }
 
-        if (mErrorsDataBase==null) {
+    /*
+    @Override
+    public void onGetNumberOfErrors(Long numberOfErrors) {
 
-            text="mErrorsDataBase==null";
+        double elapsedTime=(double)mErrorsDataBaseManager.mElapsedTime/1000.0;
+
+        String text=String.format("mErrorsDataBase has %d rows (%.1f s)", numberOfErrors,
+                elapsedTime);
+
+        if (mPreferences.mShowDebugOverlay) {
+
+            mTextViewLog1.setText(text);
         }
         else {
 
-            long start=System.currentTimeMillis();
-
-            long count=mErrorsDataBase.getNumberOfErrors();
-
-            //long elapsedTime=System.currentTimeMillis()-start;
-
-            double elapsedTime=((double)System.currentTimeMillis()-start)/1000.0;
-
-            text=String.format("mErrorsDataBase has %d rows (%.1f sec)", count, elapsedTime);
+            mTextViewLog1.setVisibility(View.INVISIBLE);
         }
+    }
+    */
 
-        mTextViewLog.setText(text);
+    @Override
+    public void reportCacheData(String data) {
 
-        //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        String zoomString="Z"+mZoomLevel+" - ";
+
+        mTextViewLog2.setText(zoomString+" "+data);
+    }
+
+    @Override
+    public void reportDatabaseMsg(String msg) {
+
+        mTextViewLog1.setText(msg);
+    }
+
+    @Override
+    public void onDataSet(KeepRightErrorSet dataSet) {
+
+
     }
 }

@@ -16,6 +16,7 @@
     <string name="go_to_newest_marker">Go to newest marker</string>
     <string name="go_to_oldest_marker">Go to oldest marker</string>
     <string name="key_debug" translatable="false">Key_Debug</string>
+    <string name="key_errors" translatable="false">Key_Errors</string>
     <string name="key_lat" translatable="false">Key_Lat</string>
     <string name="key_lon" translatable="false">Key_Lon</string>
     <string name="key_preference_file" translatable="false">MapNotes_Preferences</string>
@@ -35,6 +36,7 @@
     <string name="preferences">Preferences</string>
     <string name="press_again_back">"Press again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
+    <string name="show_errors">Show KeepRight errors</string>
     <string name="there_are_no_markers">There are no markers</string>
     <string name="tile_cache_cleared">Tile Cache Cleared !!</string>
     <string name="tile_source">Tile Source:</string>

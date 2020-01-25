@@ -9,6 +9,7 @@ import org.osmdroid.config.Configuration;
 
 public class MyPreferences {
 
+    public boolean mShowErrors=false;
     public boolean mShowDebugOverlay=false;
 
     public float mLon=0;
@@ -41,6 +42,8 @@ public class MyPreferences {
         mLon = sharedPref.getFloat(context.getString(R.string.key_lon), (float) 0.0);
         mZoom = sharedPref.getFloat(context.getString(R.string.key_zoom), (float) 5.0);
 
+        mShowErrors = sharedPref.getBoolean(context.getString(R.string.key_errors), false);
+
         mShowDebugOverlay = sharedPref.getBoolean(context.getString(R.string.key_debug), false);
 
         mTileSource = sharedPref.getInt(context.getString(R.string.key_tile_source), TILE_SOURCE_MAPNIK);
@@ -63,6 +66,8 @@ public class MyPreferences {
         editor.putFloat(context.getString(R.string.key_zoom), mZoom);
 
         editor.putBoolean(context.getString(R.string.key_debug), mShowDebugOverlay);
+
+        editor.putBoolean(context.getString(R.string.key_errors), mShowErrors);
 
         editor.putInt(context.getString(R.string.key_tile_source), mTileSource);
 

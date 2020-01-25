@@ -5,6 +5,14 @@
     android:orientation="vertical">
 
     <CheckBox
+        android:id="@+id/checkBoxShowErrors"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/show_errors" />
+
+    <CheckBox
         android:id="@+id/checkBoxDebug"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

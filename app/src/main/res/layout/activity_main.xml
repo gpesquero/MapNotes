@@ -77,7 +77,22 @@
         app:srcCompat="@android:drawable/ic_menu_more" />
 
     <TextView
-        android:id="@+id/textViewLog"
+        android:id="@+id/textViewLog1"
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginBottom="120dp"
+        android:background="#FF000000"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#FFFFFFFF" />
+
+    <TextView
+        android:id="@+id/textViewLog2"
         android:layout_width="fill_parent"
         android:layout_height="20dp"
         android:layout_alignParentStart="true"
