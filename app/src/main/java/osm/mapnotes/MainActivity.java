@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public static MyPreferences mPreferences = new MyPreferences();
 
+    private static double DEFAULT_ANIMATE_TO_ZOOM=16.0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -787,8 +789,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             Toast.makeText(this, "MapDatabase.deleteMarker() error. Marker not found",
                     Toast.LENGTH_LONG).show();
-
-
         }
     }
 
@@ -841,8 +841,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             Toast.makeText(this, "MapDatabase.updateMarker() error. Marker not found",
                     Toast.LENGTH_LONG).show();
-
-
         }
     }
 
@@ -987,20 +985,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             return;
         }
 
-        Toast.makeText(this, R.string.go_to_marker_+selMarker.getTitle(),
-                    Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.go_to_marker_)+"\n"+
+                        "<"+selMarker.getTitle()+">\n"+
+                        "["+DateFormat.getDateInstance().format(selDate)+"]",
+                        Toast.LENGTH_LONG).show();
 
-        mMapController.animateTo(selMarker.getPosition());
+        mMapController.animateTo(selMarker.getPosition(), DEFAULT_ANIMATE_TO_ZOOM, null);
     }
 
     private void onScrollZoomChange() {
+
+        mZoomLevel=(int)Math.round(mMapView.getZoomLevelDouble());
+
+        mTextViewLog1.setText("ZoomLevel: "+mZoomLevel);
 
         if (mErrorsManager==null) {
 
             return;
         }
-
-        mZoomLevel=(int)Math.round(mMapView.getZoomLevelDouble());
 
         if (mZoomLevel<16) {
 
@@ -1016,8 +1018,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             mErrorsManager.getErrors(mapBounds);
         }
-
-        //mTextViewLog.setText("Zoom: "+zoom);
     }
 
     /*
