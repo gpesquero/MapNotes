@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapDatabase {
+public class MarkerDatabase {
 
     private static final int DATABASE_VERSION=1;
 
@@ -37,33 +37,21 @@ public class MapDatabase {
 
     public String mLastErrorString=null;
 
-    public MapDatabase() {
+    public MarkerDatabase() {
 
     }
 
-    public boolean openOrCreate(String databaseDir, String databaseName) {
+    public boolean openOrCreate(String markerDatabasePath) {
+
+        // String databaseDir, String databaseName
 
         close();
 
-        File dir=new File(databaseDir);
+        //File dbFile=new File(dir, databaseName);
 
-        if (!dir.exists()) {
+        //mDatabase=SQLiteDatabase.openOrCreateDatabase(dbFile.getPath(), null, null);
 
-            if (!dir.mkdir()) {
-
-                mLastErrorString="Cannot create database dir <"+databaseDir+">";
-                return false;
-            }
-        }
-        else if (!dir.isDirectory()) {
-
-            mLastErrorString="<"+databaseDir+"> is not a directory";
-            return false;
-        }
-
-        File dbFile=new File(dir, databaseName);
-
-        mDatabase=SQLiteDatabase.openOrCreateDatabase(dbFile.getPath(), null, null);
+        mDatabase=SQLiteDatabase.openOrCreateDatabase(markerDatabasePath, null, null);
 
         if (!mDatabase.isDatabaseIntegrityOk()) {
 
@@ -156,6 +144,8 @@ public class MapDatabase {
 
             markers=null;
         }
+
+        mLastErrorString="getMarkers() Ok!!";
 
         return markers;
     }

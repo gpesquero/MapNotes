@@ -15,11 +15,15 @@ import android.widget.TextView;
 public class PreferencesActivity extends AppCompatActivity implements View.OnClickListener,
         DialogInterface.OnClickListener {
 
+    CheckBox mCheckBoxShowKeepRightErrors;
+
     CheckBox mCheckBoxShowDebugOverlay;
 
     RadioGroup mRadioGroupTileSource;
 
-    TextView mTextViewDatabasePath;
+    TextView mTextViewInternalDataPath;
+    TextView mTextViewExternalDataPath;
+    TextView mTextViewMarkerDatabasePath;
 
     Button mButtonClearTileCache;
 
@@ -31,6 +35,9 @@ public class PreferencesActivity extends AppCompatActivity implements View.OnCli
 
         setContentView(R.layout.activity_preferences);
 
+        mCheckBoxShowKeepRightErrors=findViewById(R.id.checkBoxShowErrors);
+        mCheckBoxShowKeepRightErrors.setChecked(MainActivity.mPreferences.mShowKeepRightErrors);
+
         mCheckBoxShowDebugOverlay=findViewById(R.id.checkBoxDebug);
         mCheckBoxShowDebugOverlay.setChecked(MainActivity.mPreferences.mShowDebugOverlay);
 
@@ -39,11 +46,21 @@ public class PreferencesActivity extends AppCompatActivity implements View.OnCli
                 MainActivity.mPreferences.mTileSource+1);
         radioButton.setChecked(true);
 
-        mTextViewDatabasePath=findViewById(R.id.textViewDatabasePath);
+        mTextViewInternalDataPath=findViewById(R.id.textViewInternalDataPath);;
+        mTextViewInternalDataPath.setText(MainActivity.mPreferences.mInternalDataPath);
 
+        mTextViewExternalDataPath=findViewById(R.id.textViewExternalDataPath);;
+        mTextViewExternalDataPath.setText(MainActivity.mPreferences.mExternalDataPath);
+
+        mTextViewMarkerDatabasePath=findViewById(R.id.textViewMarkerDatabasePath);
+        mTextViewMarkerDatabasePath.setText(MainActivity.mPreferences.mInternalDataPath+
+                MainActivity.mPreferences.mMarkerDatabaseName);
+
+        /*
         String fullPath=MainActivity.mPreferences.mDatabaseDir+
                 MainActivity.mPreferences.mDatabaseName;
         mTextViewDatabasePath.setText(fullPath);
+        */
 
         mButtonClearTileCache=findViewById(R.id.buttonClearTileCache);
         mButtonClearTileCache.setOnClickListener(this);
@@ -53,11 +70,14 @@ public class PreferencesActivity extends AppCompatActivity implements View.OnCli
     protected void onDestroy() {
         super.onDestroy();
 
+        MainActivity.mPreferences.mShowKeepRightErrors=mCheckBoxShowKeepRightErrors.isChecked();
+
         MainActivity.mPreferences.mShowDebugOverlay=mCheckBoxShowDebugOverlay.isChecked();
 
         int id=mRadioGroupTileSource.getCheckedRadioButtonId();
 
         if (id<0) {
+
             MainActivity.mPreferences.mTileSource=MyPreferences.TILE_SOURCE_DEFAULT;
         }
         else {

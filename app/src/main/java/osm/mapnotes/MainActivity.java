@@ -37,7 +37,6 @@ import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -71,9 +70,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     CrossHairOverlay mCrossHairOverlay = null;
     DebugOverlay mDebugOverlay = null;
 
+    /*
     ItemizedIconOverlay mMarkersOverlay=null;
 
     ItemizedIconOverlay mErrorsOverlay=null;
+    */
 
     ArrayList<OverlayItem> mMarkerItems=new ArrayList<OverlayItem>();
 
@@ -91,15 +92,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     Location mLocation = null;
 
-    MapDatabase mDatabase=null;
+    MarkerDatabase mMarkerDatabase=null;
 
     KeepRightErrorsManager mErrorsManager=null;
 
     Drawable mMarkerIcon=null;
 
-    private static int REQUEST_CODE_LOCATION = 0;
-    private static int REQUEST_CODE_EXTERNAL_STORAGE = 1;
-    private static int REQUEST_CODE_PREFERENCES = 2;
+    final private static int REQUEST_CODE_LOCATION = 0;
+    final private static int REQUEST_CODE_EXTERNAL_STORAGE = 1;
+    final private static int REQUEST_CODE_PREFERENCES = 2;
 
     int mZoomLevel=0;
 
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     TextView mTextViewLog1 = null;
     TextView mTextViewLog2 = null;
+    TextView mTextViewLog3 = null;
 
     private boolean mTick = true;
 
@@ -122,7 +124,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public static MyPreferences mPreferences = new MyPreferences();
 
-    private static double DEFAULT_ANIMATE_TO_ZOOM=16.0;
+    final private static double DEFAULT_ANIMATE_TO_ZOOM=16.0;
+
+    final private static float BOUNDING_BOX_SCALE=(float)1.5;
+
+    final private static int MIN_ERRORS_ZOOM_LEVEL=16;
+
+    private static boolean mFirstTime=true;
+
+    GpxManager mGpxManager=new GpxManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,11 +146,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mMapView = (MapView) findViewById(R.id.map);
         setMapTileSource();
-        //mMapView.setBuiltInZoomControls(true);
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
         mMapView.setMultiTouchControls(true);
-        //mMapView.setTilesScaledToDpi(true);
-        //mMapView.addMapListener(this);
 
         final int MAP_LISTENER_DELAY = 500;
 
@@ -184,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mTextViewLog1 = (TextView) findViewById(R.id.textViewLog1);
         mTextViewLog2 = (TextView) findViewById(R.id.textViewLog2);
+        mTextViewLog3 = (TextView) findViewById(R.id.textViewLog3);
 
         createLocationIcons(context);
 
@@ -231,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mDebugOverlay = new DebugOverlay(mLocationStatus);
         mDebugOverlay.setEnabled(mPreferences.mShowDebugOverlay);
 
+        /*
         mMarkersOverlay = new ItemizedIconOverlay<OverlayItem>(mMarkerItems,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
@@ -248,13 +257,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mMarkersOverlay.setEnabled(true);
 
         mMapView.getOverlays().add(mMarkersOverlay);
+        */
 
         mMarkerIcon = getResources().getDrawable(android.R.drawable.btn_star_big_on);
 
+        /*
         mErrorsOverlay = new ItemizedIconOverlay<OverlayItem>(mErrorItems,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+
+                        //Marker marker=item.getMarker(OverlayItem .ITEM_STATE_PRESSED_MASK);
+
                         //do something
                         return true;
                     }
@@ -268,13 +282,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mErrorsOverlay.setEnabled(true);
 
         mMapView.getOverlays().add(mErrorsOverlay);
+        */
 
         updateLocationStatus();
 
-        mDatabase=new MapDatabase();
+        mMarkerDatabase=new MarkerDatabase();
 
-        if (mPreferences.mShowErrors) {
-            mErrorsManager = new KeepRightErrorsManager(this, mMapView);
+        if (mPreferences.mShowKeepRightErrors) {
+            mErrorsManager=new KeepRightErrorsManager(this, mMapView);
         }
         else {
 
@@ -291,7 +306,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         } else {
 
-            openMapDatabase();
+            openMarkerDatabase();
+
+            openGpxFiles();
 
             openErrorDatabase();
         }
@@ -300,35 +317,48 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             mTextViewLog1.setVisibility(View.VISIBLE);
             mTextViewLog2.setVisibility(View.VISIBLE);
+            mTextViewLog3.setVisibility(View.VISIBLE);
         }
         else {
 
             mTextViewLog1.setVisibility(View.INVISIBLE);
             mTextViewLog2.setVisibility(View.INVISIBLE);
+            mTextViewLog3.setVisibility(View.INVISIBLE);
         }
-    }
 
-    private void openMapDatabase() {
+        if (mFirstTime) {
 
-        String text;
+            mTextViewLog1.setText("First Time=true");
 
-        if (!mDatabase.openOrCreate(mPreferences.mDatabaseDir, mPreferences.mDatabaseName)) {
-
-            text="Database Error: "+mDatabase.mLastErrorString;
+            mFirstTime=false;
         }
         else {
 
-            List<MyMarker> markers=mDatabase.getMarkers(mMapView, this, mMarkerIcon);
+            mTextViewLog1.setText("First Time=false");
+        }
 
-            if (markers==null) {
+        String text;
 
-                text="Error getting database markers...";
-            }
-            else {
+        text="Markers database: "+mMarkerDatabase.mLastErrorString+"\n";
+
+        text+="GpxManager: "+mGpxManager.mLastErrorString;
+
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
+    private void openMarkerDatabase() {
+
+        //if (mMarkerDatabase.openOrCreate(mPreferences.mInternalDataPath, mPreferences.mMarkerDatabaseName)) {
+
+        if (mMarkerDatabase.openOrCreate(mPreferences.mMarkerDatabasePath)) {
+
+            List<MyMarker> markers=mMarkerDatabase.getMarkers(mMapView, this, mMarkerIcon);
+
+            if (markers!=null) {
 
                 // Map database is ok...
 
-                text=getString(R.string.loaded)+" "+markers.size()+" "+getString(R.string.markers)+"...";
+                mMarkerDatabase.mLastErrorString=getString(R.string.loaded)+" "+markers.size()+" "+getString(R.string.markers)+"...";
 
                 Iterator<MyMarker> iter=markers.iterator();
 
@@ -341,7 +371,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         }
 
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
+    private void openGpxFiles() {
+
+        mGpxManager.readFiles(mPreferences);
+
+        mMapView.getOverlayManager().addAll(mGpxManager.getPolylines());
     }
 
     private void openErrorDatabase() {
@@ -352,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         String msgString;
 
-        mErrorsManager.openErrorDatabase(this);
+        mErrorsManager.openErrorDatabase(this, mPreferences);
 
         msgString=mErrorsManager.mLastErrorString;
 
@@ -364,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             mTextViewLog1.setVisibility(View.INVISIBLE);
             mTextViewLog2.setVisibility(View.INVISIBLE);
+            mTextViewLog3.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -392,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             if ((grantResults.length==1) && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
 
-                openMapDatabase();
+                openMarkerDatabase();
 
                 openErrorDatabase();
             }
@@ -436,10 +474,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mPreferences.savePreferences(context);
 
-        if (mDatabase!=null) {
+        if (mMarkerDatabase!=null) {
 
-            mDatabase.close();
-            mDatabase=null;
+            mMarkerDatabase.close();
+            mMarkerDatabase=null;
+        }
+
+        if (mErrorsManager!=null) {
+
+            mErrorsManager.cancel();
         }
     }
 
@@ -721,10 +764,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         marker.setTitle(markerDataBundle.getString(MarkerDialogFragment.KEY_NAME));
         marker.setId(markerDataBundle.getString(MarkerDialogFragment.KEY_TIME_STAMP));
 
-        if (!mDatabase.addMarker(marker)) {
+        if (!mMarkerDatabase.addMarker(marker)) {
 
             Toast.makeText(this, "MapDatabase.addMarker() error: "+
-                    mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
+                    mMarkerDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
         }
         else {
 
@@ -764,10 +807,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                         overlays.remove(marker);
 
-                        if (!mDatabase.deleteMarker(marker)) {
+                        if (!mMarkerDatabase.deleteMarker(marker)) {
 
-                            Toast.makeText(this, "MapDatabase.deleteMarker() error: " +
-                                    mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "MapDatabase.deleteMarker() error_circle: " +
+                                    mMarkerDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
                         } else {
 
                             Toast.makeText(this, getString(R.string.marker_deleted_),
@@ -787,7 +830,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (!markerFound) {
 
-            Toast.makeText(this, "MapDatabase.deleteMarker() error. Marker not found",
+            Toast.makeText(this, "MapDatabase.deleteMarker() error_circle. Marker not found",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -821,10 +864,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                     marker.closeInfoWindow();
 
-                    if (!mDatabase.updateMarker(marker)) {
+                    if (!mMarkerDatabase.updateMarker(marker)) {
 
-                        Toast.makeText(this, "MapDatabase.updateMarker() error: " +
-                                mDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "MapDatabase.updateMarker() error_circle: " +
+                                mMarkerDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
                     }
                     else {
 
@@ -839,7 +882,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (!markerFound) {
 
-            Toast.makeText(this, "MapDatabase.updateMarker() error. Marker not found",
+            Toast.makeText(this, "MapDatabase.updateMarker() error_circle. Marker not found",
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -924,7 +967,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                         selDate=null;
 
-                        Toast.makeText(this, "DateTime parse error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "DateTime parse error_circle", Toast.LENGTH_LONG).show();
 
                         mMapController.animateTo(selMarker.getPosition());
 
@@ -944,7 +987,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                         date=null;
 
-                        Toast.makeText(this, "DateTime parse error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "DateTime parse error_circle", Toast.LENGTH_LONG).show();
 
                         mMapController.animateTo(marker.getPosition());
 
@@ -997,27 +1040,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mZoomLevel=(int)Math.round(mMapView.getZoomLevelDouble());
 
-        mTextViewLog1.setText("ZoomLevel: "+mZoomLevel);
+        //mTextViewLog1.setText("ZoomLevel: "+mZoomLevel);
 
         if (mErrorsManager==null) {
 
             return;
         }
 
-        if (mZoomLevel<16) {
+        if (mZoomLevel<MIN_ERRORS_ZOOM_LEVEL) {
 
-            mErrorsOverlay.setEnabled(false);
+            deleteAllKeepRightErrors();
+
+            //mErrorsOverlay.setEnabled(false);
 
             reportCacheData("");
         }
         else {
 
-            mErrorsOverlay.setEnabled(true);
+            //mErrorsOverlay.setEnabled(true);
+
+            deleteKeepRightErrorsOutOfBounds();
 
             BoundingBox mapBounds=mMapView.getBoundingBox();
 
             mErrorsManager.getErrors(mapBounds);
         }
+
+        int count=mMapView.getOverlays().size();
+
+        mTextViewLog3.setText("Number of overlays: "+count);
     }
 
     /*
@@ -1080,6 +1131,105 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onDataSet(KeepRightErrorSet dataSet) {
 
+        if (mZoomLevel<MIN_ERRORS_ZOOM_LEVEL) {
+            return;
+        }
 
+        BoundingBox bbox=mMapView.getBoundingBox().increaseByScale(BOUNDING_BOX_SCALE);
+
+        Iterator<KeepRightError> iter=dataSet.getData().iterator();
+
+        while(iter.hasNext()) {
+
+            KeepRightError error=iter.next();
+
+            if (!bbox.contains(error.getPosition()))
+                continue;
+
+            if (errorAlreadyExists(error.getId()))
+                continue;
+
+            /*
+            error_circle.setMarker(getResources().getDrawable(R.drawable.error_circle));
+
+            mErrorsOverlay.addItem(error_circle);
+            */
+
+            error.selectIcon(getResources());
+
+            //error_circle.setIcon(getResources().getDrawable(R.drawable.error_circle));
+
+            mMapView.getOverlays().add(error);
+        }
+
+        //int count=mErrorsOverlay.size();
+
+        int count=mMapView.getOverlays().size();
+
+        mTextViewLog3.setText("Number of overlays: "+count);
+    }
+
+    private boolean errorAlreadyExists(String error_id) {
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        Iterator<Overlay> iter=overlays.iterator();
+
+        while(iter.hasNext()) {
+
+            Overlay overlay=iter.next();
+
+            if (overlay instanceof KeepRightError) {
+
+                KeepRightError error=(KeepRightError)overlay;
+
+                if (error.getId().compareTo(error_id)==0) {
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void deleteAllKeepRightErrors() {
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        Iterator<Overlay> iter=overlays.iterator();
+
+        while(iter.hasNext()) {
+
+            Overlay overlay=iter.next();
+
+            if (overlay instanceof KeepRightError) {
+
+                overlays.remove(overlay);
+            }
+        }
+    }
+
+    private void deleteKeepRightErrorsOutOfBounds() {
+
+        BoundingBox bbox=mMapView.getBoundingBox().increaseByScale(BOUNDING_BOX_SCALE);
+
+        List<Overlay> overlays=mMapView.getOverlays();
+
+        Iterator<Overlay> iter=overlays.iterator();
+
+        while(iter.hasNext()) {
+
+            Overlay overlay=iter.next();
+
+            if (overlay instanceof KeepRightError) {
+
+                KeepRightError error=(KeepRightError)overlay;
+
+                if (!bbox.contains(error.getPosition())) {
+                    overlays.remove(overlay);
+                }
+            }
+        }
     }
 }

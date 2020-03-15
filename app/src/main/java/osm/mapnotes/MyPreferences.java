@@ -7,9 +7,11 @@ import android.preference.PreferenceManager;
 
 import org.osmdroid.config.Configuration;
 
+import java.io.File;
+
 public class MyPreferences {
 
-    public boolean mShowErrors=false;
+    public boolean mShowKeepRightErrors=false;
     public boolean mShowDebugOverlay=false;
 
     public float mLon=0;
@@ -27,8 +29,13 @@ public class MyPreferences {
     final static int TILE_SOURCE_USGS_TOPO=4;
     final static int TILE_SOURCE_LAST=4;
 
-    public String mDatabaseDir=null;
-    public String mDatabaseName=null;
+    public String mInternalDataPath=null;
+    public String mExternalDataPath=null;
+    public String mMarkerDatabaseName=null;
+    public String mMarkerDatabasePath=null;
+
+    private boolean mInternalDataPathIsOk=false;
+    private boolean mExternalDataPathIsOk=false;
 
     void loadPreferences(Context context) {
 
@@ -42,16 +49,51 @@ public class MyPreferences {
         mLon = sharedPref.getFloat(context.getString(R.string.key_lon), (float) 0.0);
         mZoom = sharedPref.getFloat(context.getString(R.string.key_zoom), (float) 5.0);
 
-        mShowErrors = sharedPref.getBoolean(context.getString(R.string.key_errors), false);
+        mShowKeepRightErrors = sharedPref.getBoolean(context.getString(R.string.key_errors), false);
 
         mShowDebugOverlay = sharedPref.getBoolean(context.getString(R.string.key_debug), false);
 
         mTileSource = sharedPref.getInt(context.getString(R.string.key_tile_source), TILE_SOURCE_MAPNIK);
 
-        mDatabaseDir=Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+
+        // Internal Data Path
+
+        mInternalDataPath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+
                 context.getString(R.string.app_name)+"/";
 
-        mDatabaseName=context.getString(R.string.database_name);
+        mMarkerDatabaseName=context.getString(R.string.marker_database_name);
+
+        mMarkerDatabasePath=mInternalDataPath+mMarkerDatabaseName;
+
+        File internalDir=new File(mInternalDataPath);
+
+        mInternalDataPathIsOk=false;
+
+        if (!internalDir.exists()) {
+
+            if (!internalDir.mkdir()) {
+
+                mInternalDataPathIsOk=false;
+
+                //mLastErrorString="Cannot create database dir <"+databaseDir+">";
+                //return false;
+            }
+            else {
+
+                mInternalDataPathIsOk=true;
+            }
+        }
+        else if (!internalDir.isDirectory()) {
+
+            mInternalDataPathIsOk=false;
+
+            //mLastErrorString="<"+databaseDir+"> is not a directory";
+            //return false;
+        }
+        else {
+
+            mInternalDataPathIsOk=true;
+        }
+
     }
 
     void savePreferences(Context context) {
@@ -67,7 +109,7 @@ public class MyPreferences {
 
         editor.putBoolean(context.getString(R.string.key_debug), mShowDebugOverlay);
 
-        editor.putBoolean(context.getString(R.string.key_errors), mShowErrors);
+        editor.putBoolean(context.getString(R.string.key_errors), mShowKeepRightErrors);
 
         editor.putInt(context.getString(R.string.key_tile_source), mTileSource);
 

@@ -2,7 +2,8 @@ package osm.mapnotes;
 
 import android.os.AsyncTask;
 
-import java.io.File;
+import org.osmdroid.views.MapView;
+
 import java.util.ArrayList;
 
 public class KeepRightErrorsDatabaseReader {
@@ -17,9 +18,11 @@ public class KeepRightErrorsDatabaseReader {
 
     ArrayList<String> mRequestList=new ArrayList<String>();
 
-    ErrorsDatabase mDatabase=null;
+    KeepRightErrorsDatabase mDatabase=null;
 
     String mLastErrorString=null;
+
+    private boolean mCancel=false;
 
     public long mStartTime;
     public long mElapsedTime;
@@ -53,6 +56,9 @@ public class KeepRightErrorsDatabaseReader {
 
         protected void onPostExecute(KeepRightErrorSet result) {
 
+            if (mCancel)
+                return;
+
             if (mListener==null)
                 return;
 
@@ -75,9 +81,13 @@ public class KeepRightErrorsDatabaseReader {
         void onDatabaseData(KeepRightErrorSet data, long elapsedTime);
     }
 
-    DatabaseReaderListener mListener=null;
+    private MapView mMapView=null;
 
-    public KeepRightErrorsDatabaseReader(DatabaseReaderListener listener) {
+    private DatabaseReaderListener mListener=null;
+
+    public KeepRightErrorsDatabaseReader(MapView mapView, DatabaseReaderListener listener) {
+
+        mMapView=mapView;
 
         mListener=listener;
     }
@@ -92,7 +102,7 @@ public class KeepRightErrorsDatabaseReader {
 
     public boolean openDatabase(String fileName) {
 
-        mDatabase=new ErrorsDatabase();
+        mDatabase=new KeepRightErrorsDatabase(mMapView);
 
         if (!mDatabase.openDatabase(fileName)) {
 
@@ -108,6 +118,23 @@ public class KeepRightErrorsDatabaseReader {
         mLastErrorString="Database 'keepright_error.db' opened Ok!";
 
         return true;
+    }
+
+    void close() {
+
+        mCancel=true;
+
+        while(mTask.getStatus()== AsyncTask.Status.RUNNING) {
+
+            try {
+                Thread.sleep(100);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //mTask.cancel(true);
     }
 
     public void get(String key) {

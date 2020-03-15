@@ -21,6 +21,8 @@ public class KeepRightDiskCache {
 
     ArrayList<String> mRequestList=new ArrayList<String>();
 
+    private boolean mCancel=false;
+
     class DiskReaderTask extends AsyncTask<String, Void, KeepRightErrorSet> {
 
         protected KeepRightErrorSet doInBackground(String... params) {
@@ -62,6 +64,9 @@ public class KeepRightDiskCache {
         }
 
         protected void onPostExecute(KeepRightErrorSet result) {
+
+            if (mCancel)
+                return;
 
             if (mListener==null)
                 return;
@@ -191,8 +196,15 @@ public class KeepRightDiskCache {
 
         String fileName=mDir+dataSet.getKey()+".dat";
 
+        //fileName=mDir+"prueba"+".dat";
+
         File file=new File(fileName);
 
         return dataSet.writeToDisk(file);
+    }
+
+    void close() {
+
+        mCancel=true;
     }
 }

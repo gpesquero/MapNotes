@@ -2,11 +2,16 @@ package osm.mapnotes;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.views.MapView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListener,
         KeepRightErrorsDatabaseReader.DatabaseReaderListener {
@@ -25,13 +30,15 @@ public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListe
 
     public long mElapsedTime;
 
-    Drawable mErrorIcon=null;
+    //Drawable mErrorIcon=null;
 
     KeepRightMemCache mKeepRightMemCache=new KeepRightMemCache(1000);
 
     KeepRightDiskCache mKeepRightDiskCache=new KeepRightDiskCache(this);
 
-    KeepRightErrorsDatabaseReader mDatabaseReader=new KeepRightErrorsDatabaseReader(this);
+    KeepRightErrorsDatabaseReader mDatabaseReader=null;
+
+    boolean mCancel=false;
 
     public interface KeepRightErrorsManagerListener {
 
@@ -47,9 +54,11 @@ public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListe
 
         mListener=listener;
         mMapView=mapView;
+
+        mDatabaseReader=new KeepRightErrorsDatabaseReader(mMapView, this);
     }
 
-    public boolean openErrorDatabase(Context context) {
+    public boolean openErrorDatabase(Context context, MyPreferences preferences) {
 
         File[] externalDirs = context.getExternalFilesDirs(null);
 
@@ -97,6 +106,51 @@ public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListe
             mLastErrorString="No 'keepright_errors.db' file found!!";
 
             return false;
+        }
+
+        String cacheDirName=filePath;
+
+        /*
+        //cacheDirName=context.getFilesDir().getAbsolutePath();
+
+        cacheDirName=Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+
+                context.getString(R.string.app_name)+"/cache";
+        */
+
+        cacheDirName=preferences.mInternalDataPath+"/cache";
+
+        boolean result=true;
+
+        File cacheDir=new File(cacheDirName);
+
+        if (!cacheDir.exists()) {
+
+            if (!cacheDir.mkdirs()) {
+
+                result=false;
+            }
+        }
+
+        if (result) {
+
+            File testFile = new File(cacheDir, "prueba.dat");
+
+            try {
+
+                FileOutputStream fos = new FileOutputStream(testFile);
+
+                byte[] out = new byte[]{1, 2, 3};
+
+                fos.write(out);
+
+                fos.close();
+            } catch (FileNotFoundException e) {
+
+                String text = e.getMessage();
+            } catch (IOException e) {
+
+                String text = e.getMessage();
+            }
         }
 
         mKeepRightDiskCache.setDir(filePath);
@@ -258,6 +312,9 @@ public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListe
     @Override
     public void onDiskData(KeepRightErrorSet dataSet) {
 
+        if (mCancel)
+            return;
+
         if (!dataSet.containsData()) {
 
             // Data not found on disk
@@ -284,9 +341,16 @@ public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListe
     @Override
     public void onDatabaseData(KeepRightErrorSet dataSet, long elapsedTime) {
 
+        if (mCancel)
+            return;
+
+        String msg;
+
         if (!dataSet.containsData()) {
 
             // Data not found on database
+
+            msg="KeepRight DB: Error reading data";
         }
         else {
 
@@ -297,17 +361,26 @@ public class KeepRightErrorsManager implements KeepRightDiskCache.DiskCacheListe
 
             // Include it in memory cache
             mKeepRightMemCache.add(dataSet);
+
+            msg=String.format("KeepRight DB: Read %d errors (%.1f s)",
+                    dataSet.getCount(), ((double)elapsedTime)/1000.0);
         }
+
+        mListener.reportDatabaseMsg(msg);
 
         mDatabaseDataString="Db ("+mDatabaseReader.mRead+"/"+mDatabaseReader.mTotalCount+")";
 
         reportCacheData();
 
         mListener.onDataSet(dataSet);
+    }
 
-        String msg=String.format("KeepRight DB: Read %d errors (%.1f s)",
-                dataSet.getCount(), ((double)elapsedTime)/1000.0);
+    void cancel() {
 
-        mListener.reportDatabaseMsg(msg);
+        mCancel=true;
+
+        mKeepRightDiskCache.close();
+
+        mDatabaseReader.close();
     }
 }

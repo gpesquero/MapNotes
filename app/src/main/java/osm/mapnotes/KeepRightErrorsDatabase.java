@@ -6,13 +6,14 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class ErrorsDatabase {
+public class KeepRightErrorsDatabase {
 
     private SQLiteDatabase mDatabase=null;
 
@@ -20,8 +21,11 @@ public class ErrorsDatabase {
 
     private String mSqlGetErrors="SELECT FROM errors(error_id, error_name, lon1, lon2, lon3, lat1, lat2, lat3, msg_id) VALUES(?,?,?,?,?,?,?,?,?)";
 
-    public ErrorsDatabase() {
+    MapView mMapView=null;
 
+    public KeepRightErrorsDatabase(MapView mapView) {
+
+        mMapView=mapView;
     }
 
     public boolean openDatabase(String fileName) {
@@ -31,7 +35,7 @@ public class ErrorsDatabase {
         /*
         if (!mDatabase.isDatabaseIntegrityOk()) {
 
-            mLastErrorString="Database integrity error";
+            mLastErrorString="Database integrity error_circle";
 
             mDatabase.close();
             mDatabase=null;
@@ -86,17 +90,19 @@ public class ErrorsDatabase {
         int latIndex=Integer.parseInt(key.substring(0, separatorPos));
         int lonIndex=Integer.parseInt(key.substring(separatorPos+1));
 
-        //ArrayList<KeepRightError> data=getErrors(lonIndex, latIndex);
-        ArrayList<KeepRightError> data=new ArrayList<KeepRightError>();
+        ArrayList<KeepRightError> data=getErrors(lonIndex, latIndex);
+        //ArrayList<KeepRightError> data=new ArrayList<KeepRightError>();
 
         dataSet.setData(data);
 
+        /*
         try {
             Thread.sleep(1000);
         }
         catch (InterruptedException e) {
 
         }
+        */
     }
 
     public ArrayList<KeepRightError> getErrors(int lonIndex, int latIndex) {
@@ -146,18 +152,23 @@ public class ErrorsDatabase {
 
                 String msg_id=cursor.getString(cursor.getColumnIndex("msg_id"));
 
-                //GeoPoint pos=new GeoPoint(lat, lon);
+                double lon=(lon1*100000.0+lon2)/10000000.0;
+                double lat=(lat1*100000.0+lat2)/10000000.0;
 
-                KeepRightError error=null;  //new KeepRightError(null);
+                GeoPoint pos=new GeoPoint(lat, lon);
 
-                /*
-                marker.setPosition(pos);
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-                marker.setIcon(icon);
-                marker.setDraggable(false);
-                marker.setTitle(name);
-                marker.setId(timeStamp);
-                */
+                //KeepRightError error_circle=new KeepRightError(error_id, error_name, msg_id, pos);
+
+                KeepRightError error=new KeepRightError(mMapView);
+
+                error.setPosition(pos);
+                error.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                error.setDefaultIcon();
+                error.setDraggable(false);
+                error.setId(error_id);
+
+                error.setErrorName(error_name);
+                error.setMsgId(msg_id);
 
                 data.add(error);
             }
