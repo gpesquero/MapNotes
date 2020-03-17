@@ -12,7 +12,7 @@ public class GpxManager {
 
     private int mGpxFileCount=0;
 
-    private ArrayList<Polyline> mPolylines=new ArrayList<Polyline>();
+    private ArrayList<Polyline> mPolylines=new ArrayList<>();
 
     GpxManager() {
 
@@ -20,30 +20,33 @@ public class GpxManager {
 
     public void readFiles(MyPreferences preferences) {
 
-        String gpxDirPath=preferences.mInternalDataPath+"/gpx";
+        String gpxDirPath=preferences.mInternalDataPath+"gpx";
 
         File gpxDir=new File(gpxDirPath);
 
         File[] gpxFiles=gpxDir.listFiles();
 
-        for (File file : gpxFiles) {
+        if (gpxFiles!=null) {
 
-            String filePath=file.getAbsolutePath();
+            for (File file : gpxFiles) {
 
-            if (filePath.endsWith(".gpx")) {
+                String filePath = file.getAbsolutePath();
 
-                GpxFile gpxFile=new GpxFile();
+                if (filePath.endsWith(".gpx")) {
 
-                if (gpxFile.openFile(filePath)) {
+                    GpxFile gpxFile = new GpxFile();
 
-                    mGpxFileCount++;
+                    if (gpxFile.openFile(filePath)) {
 
-                    mPolylines.addAll(gpxFile.getPolylines());
+                        mGpxFileCount++;
+
+                        mPolylines.addAll(gpxFile.getPolylines());
+                    }
                 }
             }
         }
 
-        mLastErrorString="Read "+mGpxFileCount+" Gpx files";
+        mLastErrorString="Loaded "+mGpxFileCount+" Gpx files";
     }
 
     public ArrayList<Polyline> getPolylines() {
