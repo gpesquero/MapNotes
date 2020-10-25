@@ -39,11 +39,14 @@
     <string name="press_again_back">"Press again 'Back' to exit..."</string>
     <string name="show_debug_overlay">Show debug overlay</string>
     <string name="show_errors">Show KeepRight errors</string>
+
     <string name="there_are_no_markers">There are no markers</string>
     <string name="tile_cache_cleared">Tile Cache Cleared !!</string>
+    <string name="tile_preferences">Tile Preferences</string>
     <string name="tile_source">Tile Source:</string>
     <string name="time_stamp_">Time Stamp:</string>
     <string name="title_">Title:</string>
+
     <string name="zoom">Zoom</string>
 
 </resources>

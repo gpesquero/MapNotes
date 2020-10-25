@@ -10,7 +10,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +32,11 @@ public class MarkerDatabase {
                     COL_LON+" REAL, "+
                     COL_TIME_STAMP+ " TEXT)";
 
-    SQLiteDatabase mDatabase=null;
+    SQLiteDatabase mDatabase = null;
 
-    public String mLastErrorString=null;
+    public String mLastErrorString = null;
+
+    //List<MyMarker> mMarkers = null;
 
     public MarkerDatabase() {
 
@@ -43,19 +44,17 @@ public class MarkerDatabase {
 
     public boolean openOrCreate(String markerDatabasePath) {
 
-        // String databaseDir, String databaseName
-
+        // Close database if it's already open
         close();
-
-        //File dbFile=new File(dir, databaseName);
-
-        //mDatabase=SQLiteDatabase.openOrCreateDatabase(dbFile.getPath(), null, null);
 
         mDatabase=SQLiteDatabase.openOrCreateDatabase(markerDatabasePath, null, null);
 
         if (!mDatabase.isDatabaseIntegrityOk()) {
 
             mLastErrorString="Database integrity error";
+
+            close();
+
             return false;
         }
 
@@ -68,6 +67,9 @@ public class MarkerDatabase {
         catch(SQLException e) {
 
             mLastErrorString="Error creating table <"+TABLE_MARKERS+" >: "+e.getMessage();
+
+            close();
+
             return false;
         }
 
@@ -76,18 +78,23 @@ public class MarkerDatabase {
 
     public void close() {
 
-        if (mDatabase!=null) {
+        if (mDatabase != null) {
 
             mDatabase.close();
 
-            mDatabase=null;
+            mDatabase = null;
         }
+    }
+
+    public boolean isOpen() {
+
+        return (mDatabase != null);
     }
 
     public List<MyMarker> getMarkers(MapView mapView, MyMarker.OnMyMarkerListener listener,
                                      Drawable icon) {
 
-        ArrayList<MyMarker> markers=null;
+        ArrayList<MyMarker> markers;
 
         String table=TABLE_MARKERS;
         String[] tableColumns=null;
@@ -191,7 +198,7 @@ public class MarkerDatabase {
         values.put(COL_LAT, marker.getPosition().getLatitude());
         values.put(COL_LON, marker.getPosition().getLongitude());
 
-        String whereClase=COL_TIME_STAMP+"=?";
+        String whereClause=COL_TIME_STAMP+"=?";
 
         String[] whereArgs={marker.getId()};
 
@@ -204,7 +211,7 @@ public class MarkerDatabase {
 
         try {
 
-            int rows=mDatabase.update(table, values, whereClase, whereArgs);
+            int rows=mDatabase.update(table, values, whereClause, whereArgs);
 
             if (rows!=1) {
 

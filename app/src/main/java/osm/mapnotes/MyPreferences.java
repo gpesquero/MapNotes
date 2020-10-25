@@ -39,8 +39,10 @@ public class MyPreferences {
 
     void loadPreferences(Context context) {
 
+        /*
         Configuration.getInstance().load(context,
                 PreferenceManager.getDefaultSharedPreferences(context));
+        */
 
         SharedPreferences sharedPref = context.getSharedPreferences(
                 context.getString(R.string.key_preference_file), Context.MODE_PRIVATE);

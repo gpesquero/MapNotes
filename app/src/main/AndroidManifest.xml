@@ -12,6 +12,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
+        android:name=".MapNotesApplication"
         android:allowBackup="true"
         android:icon="@drawable/round_navigation_white_48"
         android:label="@string/app_name"
@@ -27,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PreferencesActivity"
+            android:name=".MainPreferencesActivity"
             android:label="@string/preferences"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
@@ -36,6 +37,13 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".TilePreferencesActivity"
+            android:label="@string/tile_preferences"
+            android:parentActivityName=".MainPreferencesActivity"
+            android:theme="@style/AppTheme">
+
         </activity>
     </application>
 

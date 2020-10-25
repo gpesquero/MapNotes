@@ -70,12 +70,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     CrossHairOverlay mCrossHairOverlay = null;
     DebugOverlay mDebugOverlay = null;
 
-    /*
-    ItemizedIconOverlay mMarkersOverlay=null;
-
-    ItemizedIconOverlay mErrorsOverlay=null;
-    */
-
     ArrayList<OverlayItem> mMarkerItems=new ArrayList<OverlayItem>();
 
     ArrayList<OverlayItem> mErrorItems=new ArrayList<OverlayItem>();
@@ -91,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     LocationStatus mLocationStatus = new LocationStatus();
 
     Location mLocation = null;
-
-    MarkerDatabase mMarkerDatabase=null;
 
     KeepRightErrorsManager mErrorsManager=null;
 
@@ -134,9 +126,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     GpxManager mGpxManager=new GpxManager();
 
+    private MarkerDatabase mMarkerDatabase;
+
+    private MapNotesApplication mApp = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mApp = (MapNotesApplication) getApplication();
 
         Context context = getApplicationContext();
 
@@ -286,8 +284,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         updateLocationStatus();
 
-        mMarkerDatabase=new MarkerDatabase();
-
         if (mPreferences.mShowKeepRightErrors) {
             mErrorsManager=new KeepRightErrorsManager(this, mMapView);
         }
@@ -304,9 +300,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     REQUEST_CODE_EXTERNAL_STORAGE);
 
-        } else {
+        }
+        else {
 
-            openMarkerDatabase();
+            loadMarkers();
 
             openGpxFiles();
 
@@ -346,28 +343,36 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-    private void openMarkerDatabase() {
+    private void loadMarkers() {
 
-        //if (mMarkerDatabase.openOrCreate(mPreferences.mInternalDataPath, mPreferences.mMarkerDatabaseName)) {
+        mMarkerDatabase = mApp.getMarkerDatabase();
 
-        if (mMarkerDatabase.openOrCreate(mPreferences.mMarkerDatabasePath)) {
+        if (!mMarkerDatabase.isOpen()) {
 
-            List<MyMarker> markers=mMarkerDatabase.getMarkers(mMapView, this, mMarkerIcon);
+            // Marker database is closed. Let's try to open it...
+            if (!mMarkerDatabase.openOrCreate(mPreferences.mMarkerDatabasePath)) {
 
-            if (markers!=null) {
+                String text = "Error opening marker database";
 
-                // Map database is ok...
+                Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+            }
+        }
 
-                mMarkerDatabase.mLastErrorString=getString(R.string.loaded)+" "+markers.size()+" "+getString(R.string.markers)+"...";
+        List<MyMarker> markers=mMarkerDatabase.getMarkers(mMapView, this, mMarkerIcon);
 
-                Iterator<MyMarker> iter=markers.iterator();
+        if (markers != null) {
 
-                while(iter.hasNext()) {
+            // Map database is ok...
 
-                    MyMarker marker=iter.next();
+            mMarkerDatabase.mLastErrorString=getString(R.string.loaded)+" "+markers.size()+" "+getString(R.string.markers)+"...";
 
-                    mMapView.getOverlays().add(marker);
-                }
+            Iterator<MyMarker> iter=markers.iterator();
+
+            while(iter.hasNext()) {
+
+                MyMarker marker=iter.next();
+
+                mMapView.getOverlays().add(marker);
             }
         }
 
@@ -426,11 +431,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             requestLocationUpdates();
 
-        } else if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE) {
+        }
+        else if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE) {
 
             if ((grantResults.length==1) && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
 
-                openMarkerDatabase();
+                //mApp.openMarkerDatabase();
+
+                loadMarkers();
 
                 openErrorDatabase();
             }
@@ -474,12 +482,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mPreferences.savePreferences(context);
 
-        if (mMarkerDatabase!=null) {
-
-            mMarkerDatabase.close();
-            mMarkerDatabase=null;
-        }
-
         if (mErrorsManager!=null) {
 
             mErrorsManager.cancel();
@@ -496,7 +498,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Toast.makeText(this, R.string.press_again_back, Toast.LENGTH_SHORT).show();
 
             mPreviousCancelTime = currentTime;
-        } else {
+        }
+        else {
+
+            // Pressed back button twice.
+            // Close activity
+
+            mApp.destroy();
+
             super.onBackPressed();
         }
     }
@@ -527,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mLocationStatus.setStatus(i);
         mLocationStatus.setNumSats(33);
 
+        /*
         String text = "Provider: " + s;
 
         switch (i) {
@@ -547,7 +557,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 break;
         }
 
-        /*
         int sats=(int)bundle.get("satellites");
 
         text += ", Sats: " + sats;
@@ -648,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         } else if (view == mImageViewPreferences) {
 
-            Intent intent = new Intent(this, PreferencesActivity.class);
+            Intent intent = new Intent(this, MainPreferencesActivity.class);
 
             startActivityForResult(intent, REQUEST_CODE_PREFERENCES);
         }
@@ -742,8 +751,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         String userAgent=BuildConfig.APPLICATION_ID;
 
         Configuration.getInstance().setUserAgentValue(userAgent);
-
-        //"github-gpesquero-mapnotes/1.0");
 
         mMapView.setTileSource(tileSource);
     }
@@ -842,7 +849,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         // First, search marker
 
-        boolean markerFound=false;
+        boolean markerFound = false;
 
         List<Overlay> overlays=mMapView.getOverlays();
 
@@ -910,7 +917,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (requestCode==REQUEST_CODE_PREFERENCES) {
 
-            if (resultCode==PreferencesActivity.RESULT_CLEAR_TILE_CACHE) {
+            if (resultCode== TilePreferencesActivity.RESULT_CLEAR_TILE_CACHE) {
 
                 clearTileCache();
             }
