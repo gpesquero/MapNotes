@@ -20,14 +20,15 @@ public class MyPreferences {
 
     public int mTileSource=0;
 
-    final static int TILE_SOURCE_DEFAULT=0;
-    final static int TILE_SOURCE_FIRST=0;
-    final static int TILE_SOURCE_MAPNIK=0;
-    final static int TILE_SOURCE_HIKEBIKEMAP=1;
-    final static int TILE_SOURCE_PUBLIC_TRANSPORT=2;
-    final static int TILE_SOURCE_USGS_MAP=3;
-    final static int TILE_SOURCE_USGS_TOPO=4;
-    final static int TILE_SOURCE_LAST=4;
+    final static int TILE_SOURCE_DEFAULT = 0;
+    final static int TILE_SOURCE_FIRST = 0;
+    final static int TILE_SOURCE_MAPNIK = 0;
+    final static int TILE_SOURCE_HIKEBIKEMAP = 1;
+    final static int TILE_SOURCE_PUBLIC_TRANSPORT = 2;
+    final static int TILE_SOURCE_USGS_MAP = 3;
+    final static int TILE_SOURCE_USGS_TOPO = 4;
+    final static int TILE_SOURCE_OPEN_TOPO = 5;
+    final static int TILE_SOURCE_LAST = 5;
 
     public String mInternalDataPath=null;
     public String mExternalDataPath=null;

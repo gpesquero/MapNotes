@@ -36,10 +36,9 @@ public class MarkerDatabase {
 
     public String mLastErrorString = null;
 
-    //List<MyMarker> mMarkers = null;
-
     public MarkerDatabase() {
 
+        mLastErrorString = "Marker database is closed";
     }
 
     public boolean openOrCreate(String markerDatabasePath) {
@@ -47,11 +46,11 @@ public class MarkerDatabase {
         // Close database if it's already open
         close();
 
-        mDatabase=SQLiteDatabase.openOrCreateDatabase(markerDatabasePath, null, null);
+        mDatabase = SQLiteDatabase.openOrCreateDatabase(markerDatabasePath, null, null);
 
         if (!mDatabase.isDatabaseIntegrityOk()) {
 
-            mLastErrorString="Database integrity error";
+            mLastErrorString = "Database integrity error";
 
             close();
 
@@ -66,7 +65,7 @@ public class MarkerDatabase {
         }
         catch(SQLException e) {
 
-            mLastErrorString="Error creating table <"+TABLE_MARKERS+" >: "+e.getMessage();
+            mLastErrorString = "Error creating table <"+TABLE_MARKERS+" >: "+e.getMessage();
 
             close();
 
@@ -106,7 +105,7 @@ public class MarkerDatabase {
 
         if (mDatabase==null) {
 
-            mLastErrorString="Error getMarkers(): mDatabase==null";
+            mLastErrorString = "Error getMarkers(): mDatabase==null";
 
             return null;
         }

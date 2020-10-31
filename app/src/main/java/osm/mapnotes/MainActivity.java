@@ -15,7 +15,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -76,9 +75,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private long mPreviousCancelTime = 0;
 
-    private static long CANCEL_TIMEOUT = 2000;
+    private final static long CANCEL_TIMEOUT = 2000;
 
-    private static int TIMEOUT_1_SEC = 1000;
+    private final static int TIMEOUT_1_SEC = 1000;
 
     private LocationManager mLocationManager = null;
 
@@ -122,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     final private static int MIN_ERRORS_ZOOM_LEVEL=16;
 
+    // Map movement delay
+    final int MAP_LISTENER_DELAY = 500;
+
     private static boolean mFirstTime=true;
 
     GpxManager mGpxManager=new GpxManager();
@@ -136,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mApp = (MapNotesApplication) getApplication();
 
+        mMarkerDatabase = mApp.getMarkerDatabase();
+
         Context context = getApplicationContext();
 
         mPreferences.loadPreferences(context);
@@ -147,9 +151,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
         mMapView.setMultiTouchControls(true);
 
-        final int MAP_LISTENER_DELAY = 500;
-
-        // If there is more than 200 millisecs no zoom/scroll update markers
+        // Add map listener with a delay between zoom/scroll updates
         mMapView.addMapListener(new DelayedMapListener(new MapListener() {
             @Override
             public boolean onScroll(ScrollEvent event) {
@@ -740,6 +742,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             case MyPreferences.TILE_SOURCE_USGS_TOPO:
                 tileSource=TileSourceFactory.USGS_TOPO;
+                break;
+
+            case MyPreferences.TILE_SOURCE_OPEN_TOPO:
+                tileSource=TileSourceFactory.OpenTopo;
                 break;
 
             default:

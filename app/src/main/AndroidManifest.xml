@@ -14,9 +14,9 @@
     <application
         android:name=".MapNotesApplication"
         android:allowBackup="true"
-        android:icon="@drawable/round_navigation_white_48"
+        android:icon="@drawable/twotone_navigation_black_48"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/round_navigation_white_48"
+        android:roundIcon="@drawable/twotone_navigation_black_48"
         android:supportsRtl="true"
         android:theme="@style/MainActivityTheme"
         android:usesCleartextTraffic="true">

@@ -8,14 +8,15 @@
         android:id="@+id/textViewVersion"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
         android:background="@drawable/textview_border"
-        android:text="TextView" />
+        android:gravity="center"
+        android:text="Version"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <Button
         android:id="@+id/buttonTilePreferences"
