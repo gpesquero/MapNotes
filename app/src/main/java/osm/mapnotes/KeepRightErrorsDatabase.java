@@ -9,8 +9,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 public class KeepRightErrorsDatabase {
@@ -21,16 +19,16 @@ public class KeepRightErrorsDatabase {
 
     private String mSqlGetErrors="SELECT FROM errors(error_id, error_name, lon1, lon2, lon3, lat1, lat2, lat3, msg_id) VALUES(?,?,?,?,?,?,?,?,?)";
 
-    MapView mMapView=null;
+    //MapView mMapView=null;
 
-    public KeepRightErrorsDatabase(MapView mapView) {
+    public KeepRightErrorsDatabase(/*MapView mapView*/) {
 
-        mMapView=mapView;
+        //mMapView=mapView;
     }
 
     public boolean openDatabase(String fileName) {
 
-        mDatabase=SQLiteDatabase.openDatabase(fileName, null, SQLiteDatabase.OPEN_READONLY);
+        mDatabase = SQLiteDatabase.openDatabase(fileName, null, SQLiteDatabase.OPEN_READONLY);
 
         /*
         if (!mDatabase.isDatabaseIntegrityOk()) {
@@ -49,11 +47,11 @@ public class KeepRightErrorsDatabase {
 
     public void close() {
 
-        if (mDatabase!=null) {
+        if (mDatabase != null) {
 
             mDatabase.close();
 
-            mDatabase=null;
+            mDatabase = null;
         }
     }
 
@@ -61,36 +59,36 @@ public class KeepRightErrorsDatabase {
 
         long numRows;
 
-        if (mDatabase==null) {
+        if (mDatabase == null) {
 
             numRows=-1;
         }
         else {
 
-            numRows=DatabaseUtils.queryNumEntries(mDatabase, "errors");
+            numRows = DatabaseUtils.queryNumEntries(mDatabase, "errors");
         }
 
         return numRows;
     }
 
-    public KeepRightErrorSet getErrors(String key) {
+    public KeepRightErrorDataSet getErrors(String key) {
 
-        KeepRightErrorSet dataSet=new KeepRightErrorSet(key);
+        KeepRightErrorDataSet dataSet = new KeepRightErrorDataSet(key);
 
         getErrors(dataSet);
 
         return dataSet;
     }
 
-    public void getErrors(KeepRightErrorSet dataSet) {
+    public void getErrors(KeepRightErrorDataSet dataSet) {
 
-        String key=dataSet.getKey();
-        int separatorPos=key.indexOf(",");
+        String key = dataSet.getKey();
+        int separatorPos = key.indexOf(",");
 
-        int latIndex=Integer.parseInt(key.substring(0, separatorPos));
-        int lonIndex=Integer.parseInt(key.substring(separatorPos+1));
+        int latIndex = Integer.parseInt(key.substring(0, separatorPos));
+        int lonIndex = Integer.parseInt(key.substring(separatorPos+1));
 
-        ArrayList<KeepRightError> data=getErrors(lonIndex, latIndex);
+        ArrayList<KeepRightErrorData> data = getErrors(lonIndex, latIndex);
         //ArrayList<KeepRightError> data=new ArrayList<KeepRightError>();
 
         dataSet.setData(data);
@@ -105,7 +103,7 @@ public class KeepRightErrorsDatabase {
         */
     }
 
-    public ArrayList<KeepRightError> getErrors(int lonIndex, int latIndex) {
+    public ArrayList<KeepRightErrorData> getErrors(int lonIndex, int latIndex) {
 
         String table="errors";
         String[] tableColumns=null;
@@ -126,7 +124,7 @@ public class KeepRightErrorsDatabase {
             return null;
         }
 
-        ArrayList<KeepRightError> data=new ArrayList<KeepRightError>();
+        ArrayList<KeepRightErrorData> data = new ArrayList<>();
 
         //int count=1;
 
@@ -141,25 +139,24 @@ public class KeepRightErrorsDatabase {
 
             while(cursor.moveToNext()) {
 
-                String error_id=cursor.getString(cursor.getColumnIndex("error_id"));
+                String errorId = cursor.getString(cursor.getColumnIndex("error_id"));
 
-                String error_name=cursor.getString(cursor.getColumnIndex("error_name"));
+                String errorName = cursor.getString(cursor.getColumnIndex("error_name"));
 
-                int lon1=cursor.getInt(cursor.getColumnIndex("lon1"));
-                int lon2=cursor.getInt(cursor.getColumnIndex("lon2"));
-                int lat1=cursor.getInt(cursor.getColumnIndex("lat1"));
-                int lat2=cursor.getInt(cursor.getColumnIndex("lat2"));
+                int lon1 = cursor.getInt(cursor.getColumnIndex("lon1"));
+                int lon2 = cursor.getInt(cursor.getColumnIndex("lon2"));
+                int lat1 = cursor.getInt(cursor.getColumnIndex("lat1"));
+                int lat2 = cursor.getInt(cursor.getColumnIndex("lat2"));
 
-                String msg_id=cursor.getString(cursor.getColumnIndex("msg_id"));
+                String msgId = cursor.getString(cursor.getColumnIndex("msg_id"));
 
                 double lon=(lon1*100000.0+lon2)/10000000.0;
                 double lat=(lat1*100000.0+lat2)/10000000.0;
 
-                GeoPoint pos=new GeoPoint(lat, lon);
+                GeoPoint pos = new GeoPoint(lat, lon);
 
-                //KeepRightError error_circle=new KeepRightError(error_id, error_name, msg_id, pos);
-
-                KeepRightError error=new KeepRightError(mMapView);
+                /*
+                KeepRightErrorMarker error=new KeepRightErrorMarker(mMapView);
 
                 error.setPosition(pos);
                 error.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
@@ -169,8 +166,16 @@ public class KeepRightErrorsDatabase {
 
                 error.setErrorName(error_name);
                 error.setMsgId(msg_id);
+                */
 
-                data.add(error);
+                KeepRightErrorData errorData = new KeepRightErrorData();
+
+                errorData.mErrorId = errorId;
+                errorData.mPosition = pos;
+                errorData.mErrorName = errorName;
+                errorData.mMsgId = msgId;
+
+                data.add(errorData);
             }
 
             cursor.close();

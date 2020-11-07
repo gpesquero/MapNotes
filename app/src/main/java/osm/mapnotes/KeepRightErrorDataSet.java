@@ -8,14 +8,14 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class KeepRightErrorSet {
+public class KeepRightErrorDataSet {
 
-    private String mKey=null;
-    private ArrayList<KeepRightError> mData=null;
+    private String mKey = null;
+    private ArrayList<KeepRightErrorData> mData = null;
 
-    public KeepRightErrorSet(String key) {
+    public KeepRightErrorDataSet(String key) {
 
-        mKey=key;
+        mKey = key;
     }
 
     public String getKey() {
@@ -25,7 +25,7 @@ public class KeepRightErrorSet {
 
     public int getCount() {
 
-        if (mData==null)
+        if (mData == null)
             return -1;
 
         return mData.size();
@@ -33,7 +33,7 @@ public class KeepRightErrorSet {
 
     boolean containsData() {
 
-        if (mData==null) {
+        if (mData == null) {
 
             return false;
         }
@@ -41,12 +41,12 @@ public class KeepRightErrorSet {
         return true;
     }
 
-    public void setData(ArrayList<KeepRightError> data) {
+    public void setData(ArrayList<KeepRightErrorData> data) {
 
-        mData=data;
+        mData = data;
     }
 
-    public ArrayList<KeepRightError> getData() {
+    public ArrayList<KeepRightErrorData> getData() {
 
         return mData;
     }
@@ -72,22 +72,22 @@ public class KeepRightErrorSet {
 
     public boolean writeToDisk(File dataFile) {
 
-        if (mData==null) {
+        if (mData == null) {
 
             return false;
         }
 
         try {
-            FileOutputStream fos=new FileOutputStream(dataFile);
-            ObjectOutputStream oos=new ObjectOutputStream(fos);
+            FileOutputStream fos = new FileOutputStream(dataFile);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-            Iterator<KeepRightError> iter=mData.iterator();
+            Iterator<KeepRightErrorData> iterator = mData.iterator();
 
-            while(iter.hasNext()) {
+            while(iterator.hasNext()) {
 
-                KeepRightError error=iter.next();
+                KeepRightErrorData errorData=iterator.next();
 
-                oos.writeObject(error);
+                oos.writeObject(errorData);
             }
 
             oos.close();

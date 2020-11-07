@@ -16,7 +16,7 @@
         android:background="@drawable/textview_border"
         android:gravity="center"
         android:text="Version"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <Button
         android:id="@+id/buttonTilePreferences"
@@ -27,21 +27,23 @@
         android:layout_marginTop="20dp"
         android:text="@string/tile_preferences" />
 
-    <CheckBox
-        android:id="@+id/checkBoxShowErrors"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/buttonKeepRightErrorsPreferences"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:text="@string/show_errors" />
+        android:text="@string/keep_right_errors_preferences" />
 
-    <CheckBox
-        android:id="@+id/checkBoxDebug"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/buttonDebugPreferences"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:text="@string/show_debug_overlay" />
+        android:text="@string/debug_preferences" />
 
     <TextView
         android:id="@+id/textView2"

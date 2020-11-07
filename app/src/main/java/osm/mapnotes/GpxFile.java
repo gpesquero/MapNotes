@@ -23,7 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class GpxFile {
 
-    private ArrayList<Polyline> mSegments=new ArrayList<Polyline>();
+    private final ArrayList<Polyline> mSegments = new ArrayList<>();
 
     Polyline mCurrentSegment=null;
 
@@ -39,7 +39,7 @@ public class GpxFile {
 
             Document doc=dBuilder.parse(is);
 
-            String text=doc.getDocumentElement().getNodeName();
+            //String text=doc.getDocumentElement().getNodeName();
 
             if (doc.hasChildNodes()) {
 
@@ -47,11 +47,7 @@ public class GpxFile {
             }
 
         }
-        catch (ParserConfigurationException e) {
-
-            return false;
-        }
-        catch (IOException | SAXException e) {
+        catch (ParserConfigurationException | IOException | SAXException e) {
 
             return false;
         }
@@ -67,9 +63,9 @@ public class GpxFile {
 
         while(iter.hasNext()) {
 
-            Polyline line=iter.next();
+            Polyline line = iter.next();
 
-            text="Segment #"+count+" has "+line.getPoints().size()+" points";
+            text = "Segment #"+count+" has "+line.getActualPoints().size()+" points";
 
             System.out.println(text);
         }

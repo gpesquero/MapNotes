@@ -11,42 +11,45 @@ import android.graphics.drawable.VectorDrawable;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-public class KeepRightError extends /*OverlayItem*/ Marker {
+public class KeepRightErrorMarker extends Marker {
 
-    private String mErrorName=null;
-    private String mMsgId=null;
+    private String mErrorName = null;
+    private String mMsgId = null;
 
-    public KeepRightError(MapView mapView) { //, MyMarker.OnMyMarkerListener listener ) {
+    public KeepRightErrorMarker(MapView mapView, KeepRightErrorData data) {
         super(mapView);
 
-        //mListener=listener;
-    }
+        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        setDefaultIcon();
+        setDraggable(false);
 
-    /*
-    public KeepRightError(String id, String title, String description, GeoPoint geoPoint) {
-        super(id, title, description, geoPoint);
+        if (data != null) {
 
+            setPosition(data.mPosition);
+            setId(data.mErrorId);
+            setErrorName(data.mErrorName);
+            setMsgId(data.mMsgId);
+        }
     }
-    */
 
     public void setErrorName(String errorName) {
 
-        mErrorName=errorName;
+        mErrorName = errorName;
     }
 
     public void setMsgId(String msgId) {
 
-        mMsgId=msgId;
+        mMsgId = msgId;
 
         setTitle(mErrorName+" ["+mMsgId+"]");
     }
 
     public void selectIcon(Resources res) {
 
-        int drawableId=R.drawable.error_circle;
-        int color=Color.parseColor("black");
+        int drawableId = R.drawable.error_circle;
+        int color = Color.parseColor("black");
 
-        String values[][]= {
+        String[][] values = {
                 {"almost-junctions",                    "circle", "red"},
                 {"deprecated tags",                     "circle", "green"},
                 {"point of interest without name",      "circle", "blue"},

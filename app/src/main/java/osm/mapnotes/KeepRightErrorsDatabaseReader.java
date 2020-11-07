@@ -2,11 +2,9 @@ package osm.mapnotes;
 
 import android.os.AsyncTask;
 
-import org.osmdroid.views.MapView;
-
 import java.util.ArrayList;
 
-public class KeepRightErrorsDatabaseReader {
+public class KeepRightErrorsDatabaseReader extends BaseThread {
 
     final static int STATE_IDLE=0;
     final static int STATE_RUNNING=1;
@@ -14,9 +12,9 @@ public class KeepRightErrorsDatabaseReader {
     public int mRead=0;
     public int mTotalCount=0;
 
-    int mState=STATE_IDLE;
+    int mState = STATE_IDLE;
 
-    ArrayList<String> mRequestList=new ArrayList<String>();
+    //ArrayList<String> mRequestList=new ArrayList<String>();
 
     KeepRightErrorsDatabase mDatabase=null;
 
@@ -27,7 +25,8 @@ public class KeepRightErrorsDatabaseReader {
     public long mStartTime;
     public long mElapsedTime;
 
-    class DatabaseReaderTask extends AsyncTask<String, Void, KeepRightErrorSet> {
+    /*
+    class DatabaseReaderTask extends AsyncTask<String, Void, KeepRightErrorDataSet> {
 
         @Override
         protected void onPreExecute() {
@@ -35,16 +34,16 @@ public class KeepRightErrorsDatabaseReader {
             mStartTime=System.currentTimeMillis();
         }
 
-        protected KeepRightErrorSet doInBackground(String... params) {
+        protected KeepRightErrorDataSet doInBackground(String... params) {
 
             if (params.length==0) {
 
-                return new KeepRightErrorSet("ERROR");
+                return new KeepRightErrorDataSet("ERROR");
             }
 
             String key=params[0];
 
-            KeepRightErrorSet dataSet=new KeepRightErrorSet(key);
+            KeepRightErrorDataSet dataSet=new KeepRightErrorDataSet(key);
 
             if (mDatabase==null)
                 return dataSet;
@@ -54,7 +53,7 @@ public class KeepRightErrorsDatabaseReader {
             return dataSet;
         }
 
-        protected void onPostExecute(KeepRightErrorSet result) {
+        protected void onPostExecute(KeepRightErrorDataSet result) {
 
             if (mCancel)
                 return;
@@ -73,25 +72,112 @@ public class KeepRightErrorsDatabaseReader {
             launchNextRequest();
         }
     };
+    */
 
-    private DatabaseReaderTask mTask=null;
+    //private DatabaseReaderTask mTask=null;
 
     public interface DatabaseReaderListener {
 
-        void onDatabaseData(KeepRightErrorSet data, long elapsedTime);
+        void onDatabaseData(KeepRightErrorDataSet data, long elapsedTime);
     }
 
-    private MapView mMapView=null;
+    public class DatabaseEvent extends ThreadEvent {
+
+        public String mKey;
+
+        KeepRightErrorDataSet mDataSet;
+    }
+
+    //private MapView mMapView=null;
 
     private DatabaseReaderListener mListener=null;
 
-    public KeepRightErrorsDatabaseReader(MapView mapView, DatabaseReaderListener listener) {
+    public KeepRightErrorsDatabaseReader(/* MapView mapView, */DatabaseReaderListener listener) {
 
-        mMapView=mapView;
+        //mMapView=mapView;
 
-        mListener=listener;
+        setListener(listener);
     }
 
+    public void setListener(DatabaseReaderListener listener) {
+
+        mListener=listener;
+
+        createHandler();
+    }
+
+    @Override
+    public void run() {
+
+        try {
+
+            while(!isInterrupted()) {
+
+                ThreadEvent event = waitForInputEvent();
+
+                if (!(event instanceof DatabaseEvent)) {
+
+                    // Received event is not of type DatabaseEvent
+                    continue;
+                }
+
+                DatabaseEvent databaseEvent = (DatabaseEvent) event;
+
+                String key = databaseEvent.mKey;
+
+                KeepRightErrorDataSet dataSet=new KeepRightErrorDataSet(key);
+
+                if (mDatabase != null) {
+
+                    mStartTime=System.currentTimeMillis();
+
+                    mDatabase.getErrors(dataSet);
+                }
+                else {
+
+                    dataSet.setData(null);
+                }
+
+                databaseEvent.mDataSet = dataSet;
+
+                addOutputEvent(databaseEvent);
+            }
+
+        } catch (InterruptedException e) {
+
+            // Thread has been interrupted
+
+            // Close database
+            closeDatabase();
+        }
+    }
+
+    @Override
+    protected void dispatchEvent(ThreadEvent event) {
+
+        mState = STATE_IDLE;
+
+        if (event == null) {
+            return;
+        }
+
+        if (!(event instanceof DatabaseEvent)) {
+
+            // Received event is not of type DatabaseEvent
+            return;
+        }
+
+        DatabaseEvent databaseEvent = (DatabaseEvent)event;
+
+        mElapsedTime = System.currentTimeMillis()-mStartTime;
+
+        if (mListener != null) {
+
+            mListener.onDatabaseData(databaseEvent.mDataSet, mElapsedTime);
+        }
+    }
+
+    /*
     public void clearRequests() {
 
         mRequestList.clear();
@@ -99,10 +185,11 @@ public class KeepRightErrorsDatabaseReader {
         mRead=0;
         mTotalCount=0;
     }
+    */
 
     public boolean openDatabase(String fileName) {
 
-        mDatabase=new KeepRightErrorsDatabase(mMapView);
+        mDatabase = new KeepRightErrorsDatabase(/*mMapView*/);
 
         if (!mDatabase.openDatabase(fileName)) {
 
@@ -110,7 +197,7 @@ public class KeepRightErrorsDatabaseReader {
 
             mDatabase.close();
 
-            mDatabase=null;
+            mDatabase = null;
 
             return false;
         }
@@ -120,10 +207,26 @@ public class KeepRightErrorsDatabaseReader {
         return true;
     }
 
+    public void closeDatabase() {
+
+        mDatabase.close();
+
+        mDatabase = null;
+    }
+
+    public boolean databaseIsOpen() {
+
+        return (mDatabase != null);
+    }
+
     void close() {
 
-        mCancel=true;
+        mCancel = true;
 
+        // Interrupt thread
+        interrupt();
+
+        /*
         while(mTask.getStatus()== AsyncTask.Status.RUNNING) {
 
             try {
@@ -133,12 +236,14 @@ public class KeepRightErrorsDatabaseReader {
                 e.printStackTrace();
             }
         }
+        */
 
         //mTask.cancel(true);
     }
 
-    public void get(String key) {
+    public void requestData(String key) {
 
+        /*
         boolean found=false;
 
         for(int i=0; i<mRequestList.size(); i++) {
@@ -161,8 +266,23 @@ public class KeepRightErrorsDatabaseReader {
         launchNextRequest();
 
         mTotalCount++;
+        */
+
+        DatabaseEvent databaseEvent = new DatabaseEvent();
+
+        databaseEvent.mKey = key;
+
+        mState = STATE_RUNNING;
+
+        addInputEvent(databaseEvent);
     }
 
+    public boolean isIdle() {
+
+        return (mState == STATE_IDLE);
+    }
+
+    /*
     private void launchNextRequest() {
 
         if (mState==STATE_RUNNING) {
@@ -182,5 +302,5 @@ public class KeepRightErrorsDatabaseReader {
         mTask=new DatabaseReaderTask();
         mTask.execute(key);
     }
-
+    */
 }

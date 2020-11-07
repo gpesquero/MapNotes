@@ -4,14 +4,20 @@ import java.util.ArrayList;
 
 public class KeepRightMemCache {
 
-    private int mMaxObjects=100;
+    private final int DEFAULT_MAX_OBJECTS = 100;
 
-    private ArrayList<String> mKeys=new ArrayList<String>();
-    private ArrayList<KeepRightErrorSet> mData=new ArrayList<KeepRightErrorSet>();
+    private int mMaxObjects = DEFAULT_MAX_OBJECTS;
+
+    private ArrayList<String> mKeys = new ArrayList<String>();
+    private ArrayList<KeepRightErrorDataSet> mData = new ArrayList<KeepRightErrorDataSet>();
+
+    // Statistics
+    private int mRequestCount = 0;
+    private int mHitCount = 0;
 
     public KeepRightMemCache(int maxObjects) {
 
-        mMaxObjects=maxObjects;
+        mMaxObjects = maxObjects;
     }
 
     public int size() {
@@ -19,44 +25,73 @@ public class KeepRightMemCache {
         return mKeys.size();
     }
 
-    public void add(KeepRightErrorSet dataSet) {
+    public int maxSize() {
+
+        return mMaxObjects;
+    }
+
+    public int requestCount() {
+
+        return mRequestCount;
+    }
+
+    public int hitCount() {
+
+        return mHitCount;
+    }
+
+    public void add(KeepRightErrorDataSet dataSet) {
 
         add(dataSet.getKey(), dataSet);
     }
 
-    public void add(String key, KeepRightErrorSet data) {
+    public void add(String key, KeepRightErrorDataSet data) {
 
-        int pos=mKeys.indexOf(key);
+        int pos = mKeys.indexOf(key);
 
-        if (pos>=0) {
+        if (pos >= 0) {
 
+            // Item has been found. Remove it from cache
             mKeys.remove(pos);
             mData.remove(pos);
         }
 
+        // Add item at the beginning of cache
         mKeys.add(0, key);
         mData.add(0, data);
 
-        int size=mKeys.size();
+        // Get size of cache
+        int size = mKeys.size();
 
-        if (size>mMaxObjects) {
+        if (size > mMaxObjects) {
 
+            // Remove last item of cache
             mKeys.remove(size-1);
             mData.remove(size-1);
         }
     }
 
-    public KeepRightErrorSet get(String key) {
+    public KeepRightErrorDataSet get(String key) {
 
-        int pos=mKeys.indexOf(key);
+        // For statistics, store the number of get requests
+        mRequestCount++;
+
+        int pos = mKeys.indexOf(key);
 
         if (pos<0) {
+
+            // Item not found in cache
             return null;
         }
 
-        mKeys.remove(pos);
-        KeepRightErrorSet object=mData.remove(pos);
+        // Increment hit count
+        mHitCount++;
 
+        // Remove item from cache
+        mKeys.remove(pos);
+        KeepRightErrorDataSet object=mData.remove(pos);
+
+        // Add item at the beginning of cache
         mKeys.add(0, key);
         mData.add(0, object);
 

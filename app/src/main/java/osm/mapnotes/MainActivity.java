@@ -113,11 +113,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private Bitmap redLocationIcon = null;
     private Bitmap greenLocationIcon = null;
 
-    public static MyPreferences mPreferences = new MyPreferences();
+    private MyPreferences mPreferences = null;
 
-    final private static double DEFAULT_ANIMATE_TO_ZOOM=16.0;
+    final private static double DEFAULT_ANIMATE_TO_ZOOM = 16.0;
 
-    final private static float BOUNDING_BOX_SCALE=(float)1.5;
+    final private static float BOUNDING_BOX_SCALE = (float)1.5;
 
     final private static int MIN_ERRORS_ZOOM_LEVEL=16;
 
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         Context context = getApplicationContext();
 
-        mPreferences.loadPreferences(context);
+        mPreferences = mApp.getPreferences();
 
         setContentView(R.layout.activity_main);
 
@@ -287,11 +287,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         updateLocationStatus();
 
         if (mPreferences.mShowKeepRightErrors) {
-            mErrorsManager=new KeepRightErrorsManager(this, mMapView);
+
+            mErrorsManager = mApp.getKeepRightErrorManager();
+
+            mErrorsManager.setListener(this);
+
+            //mErrorsManager=new KeepRightErrorsManager(this, mMapView);
         }
         else {
 
-            mErrorsManager=null;
+            mErrorsManager = null;
         }
 
         if (ActivityCompat.checkSelfPermission(this,
@@ -390,13 +395,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void openErrorDatabase() {
 
-        if (mErrorsManager==null) {
+        mErrorsManager = mApp.getKeepRightErrorManager();
+
+        if (mErrorsManager == null) {
             return;
         }
 
-        String msgString;
+        mErrorsManager.setListener(this);
 
-        mErrorsManager.openErrorDatabase(this, mPreferences);
+        if (!mErrorsManager.databaseIsOpen()) {
+
+            // Open database
+
+            mErrorsManager.openErrorDatabase(this, mPreferences);
+        }
+
+        String msgString;
 
         msgString=mErrorsManager.mLastErrorString;
 
@@ -476,18 +490,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onDestroy() {
         super.onDestroy();
 
-        mPreferences.mLon = (float) mMapView.getMapCenter().getLongitude();
-        mPreferences.mLat = (float) mMapView.getMapCenter().getLatitude();
-        mPreferences.mZoom = (float) mMapView.getZoomLevelDouble();
+        mErrorsManager.setListener(null);
 
-        Context context = getApplicationContext();
+        if (mPreferences != null) {
 
-        mPreferences.savePreferences(context);
+            mPreferences.mLon = (float) mMapView.getMapCenter().getLongitude();
+            mPreferences.mLat = (float) mMapView.getMapCenter().getLatitude();
+            mPreferences.mZoom = (float) mMapView.getZoomLevelDouble();
+        }
 
+        /*
         if (mErrorsManager!=null) {
 
             mErrorsManager.cancel();
         }
+        */
     }
 
     @Override
@@ -1051,17 +1068,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void onScrollZoomChange() {
 
-        mZoomLevel=(int)Math.round(mMapView.getZoomLevelDouble());
+        // Get actual zoom level
+        mZoomLevel = (int)Math.round(mMapView.getZoomLevelDouble());
 
         //mTextViewLog1.setText("ZoomLevel: "+mZoomLevel);
 
-        if (mErrorsManager==null) {
+        if (mErrorsManager == null) {
 
+            // Error manager is null. Return...
             return;
         }
 
-        if (mZoomLevel<MIN_ERRORS_ZOOM_LEVEL) {
+        if (mZoomLevel < MIN_ERRORS_ZOOM_LEVEL) {
 
+            // Zoom level is too low.
+            // Remove all errors from map
             deleteAllKeepRightErrors();
 
             //mErrorsOverlay.setEnabled(false);
@@ -1072,15 +1093,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             //mErrorsOverlay.setEnabled(true);
 
+            // Zoom level is close enough to show errors
+
+            // Delete all errors out of map bounds
             deleteKeepRightErrorsOutOfBounds();
 
+            // Get actual map bounds
             BoundingBox mapBounds=mMapView.getBoundingBox();
 
+            // Request KeepRight errors to manager...
             mErrorsManager.getErrors(mapBounds);
         }
 
-        int count=mMapView.getOverlays().size();
+        // Get current overlay count
+        int count = mMapView.getOverlays().size();
 
+        // Display number of overlays in debug text view
         mTextViewLog3.setText("Number of overlays: "+count);
     }
 
@@ -1142,7 +1170,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     @Override
-    public void onDataSet(KeepRightErrorSet dataSet) {
+    public void onDataSet(KeepRightErrorDataSet dataSet) {
 
         if (mZoomLevel<MIN_ERRORS_ZOOM_LEVEL) {
             return;
@@ -1150,29 +1178,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         BoundingBox bbox=mMapView.getBoundingBox().increaseByScale(BOUNDING_BOX_SCALE);
 
-        Iterator<KeepRightError> iter=dataSet.getData().iterator();
+        if (!dataSet.containsData()) {
 
-        while(iter.hasNext()) {
+            // Set does not contain data...
+            return;
+        }
 
-            KeepRightError error=iter.next();
+        Iterator<KeepRightErrorData> iterator=dataSet.getData().iterator();
 
-            if (!bbox.contains(error.getPosition()))
+        while(iterator.hasNext()) {
+
+            KeepRightErrorData errorData = iterator.next();
+
+            if (!bbox.contains(errorData.mPosition))
                 continue;
 
-            if (errorAlreadyExists(error.getId()))
+            if (errorAlreadyExists(errorData.mErrorId))
                 continue;
 
-            /*
-            error_circle.setMarker(getResources().getDrawable(R.drawable.error_circle));
+            KeepRightErrorMarker errorMarker = new KeepRightErrorMarker(mMapView, errorData);
 
-            mErrorsOverlay.addItem(error_circle);
-            */
+            errorMarker.selectIcon(getResources());
 
-            error.selectIcon(getResources());
-
-            //error_circle.setIcon(getResources().getDrawable(R.drawable.error_circle));
-
-            mMapView.getOverlays().add(error);
+            mMapView.getOverlays().add(errorMarker);
         }
 
         //int count=mErrorsOverlay.size();
@@ -1192,9 +1220,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             Overlay overlay=iter.next();
 
-            if (overlay instanceof KeepRightError) {
+            if (overlay instanceof KeepRightErrorMarker) {
 
-                KeepRightError error=(KeepRightError)overlay;
+                KeepRightErrorMarker error=(KeepRightErrorMarker)overlay;
 
                 if (error.getId().compareTo(error_id)==0) {
 
@@ -1216,7 +1244,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             Overlay overlay=iter.next();
 
-            if (overlay instanceof KeepRightError) {
+            if (overlay instanceof KeepRightErrorMarker) {
 
                 overlays.remove(overlay);
             }
@@ -1235,9 +1263,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             Overlay overlay=iter.next();
 
-            if (overlay instanceof KeepRightError) {
+            if (overlay instanceof KeepRightErrorMarker) {
 
-                KeepRightError error=(KeepRightError)overlay;
+                KeepRightErrorMarker error=(KeepRightErrorMarker)overlay;
 
                 if (!bbox.contains(error.getPosition())) {
                     overlays.remove(overlay);

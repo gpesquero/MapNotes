@@ -10,11 +10,11 @@ import org.osmdroid.views.overlay.Overlay;
 
 public class DebugOverlay extends Overlay {
 
-    private LocationStatus mLocationStatus;
+    private final LocationStatus mLocationStatus;
 
     public DebugOverlay(LocationStatus locationStatus) {
 
-        mLocationStatus=locationStatus;
+        mLocationStatus = locationStatus;
     }
 
     @Override

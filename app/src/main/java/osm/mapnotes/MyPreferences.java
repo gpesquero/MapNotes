@@ -3,9 +3,6 @@ package osm.mapnotes;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-
-import org.osmdroid.config.Configuration;
 
 import java.io.File;
 

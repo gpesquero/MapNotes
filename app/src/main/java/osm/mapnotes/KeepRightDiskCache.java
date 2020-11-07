@@ -23,18 +23,18 @@ public class KeepRightDiskCache {
 
     private boolean mCancel=false;
 
-    class DiskReaderTask extends AsyncTask<String, Void, KeepRightErrorSet> {
+    class DiskReaderTask extends AsyncTask<String, Void, KeepRightErrorDataSet> {
 
-        protected KeepRightErrorSet doInBackground(String... params) {
+        protected KeepRightErrorDataSet doInBackground(String... params) {
 
             if (params.length==0) {
 
-                return new KeepRightErrorSet("ERROR");
+                return new KeepRightErrorDataSet("ERROR");
             }
 
             String key=params[0];
 
-            KeepRightErrorSet dataSet=new KeepRightErrorSet(key);
+            KeepRightErrorDataSet dataSet=new KeepRightErrorDataSet(key);
 
             if (mDir==null)
                 return dataSet;
@@ -63,7 +63,7 @@ public class KeepRightDiskCache {
             return dataSet;
         }
 
-        protected void onPostExecute(KeepRightErrorSet result) {
+        protected void onPostExecute(KeepRightErrorDataSet result) {
 
             if (mCancel)
                 return;
@@ -85,7 +85,7 @@ public class KeepRightDiskCache {
 
     public interface DiskCacheListener {
 
-        void onDiskData(KeepRightErrorSet data);
+        void onDiskData(KeepRightErrorDataSet data);
     }
 
     DiskCacheListener mListener=null;
@@ -189,7 +189,7 @@ public class KeepRightDiskCache {
         */
     }
 
-    public boolean writeToDisk(KeepRightErrorSet dataSet) {
+    public boolean writeToDisk(KeepRightErrorDataSet dataSet) {
 
         if (mDir==null)
             return false;

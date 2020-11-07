@@ -4,7 +4,6 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class GpxManager {
 

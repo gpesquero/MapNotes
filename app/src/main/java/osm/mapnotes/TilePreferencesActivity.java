@@ -13,6 +13,8 @@ import android.widget.RadioGroup;
 public class TilePreferencesActivity extends AppCompatActivity
         implements View.OnClickListener, OnClickListener {
 
+    MyPreferences mPreferences;
+
     RadioGroup mRadioGroupTileSource;
 
     Button mButtonClearTileCache;
@@ -24,9 +26,13 @@ public class TilePreferencesActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tile_preferences);
 
+        MapNotesApplication app = (MapNotesApplication)getApplication();
+
+        mPreferences = app.getPreferences();
+
         mRadioGroupTileSource=findViewById(R.id.radioGroupTileSource);
         RadioButton radioButton=(RadioButton)mRadioGroupTileSource.getChildAt(
-                MainActivity.mPreferences.mTileSource+1);
+                mPreferences.mTileSource);
         radioButton.setChecked(true);
 
         mButtonClearTileCache=findViewById(R.id.buttonClearTileCache);
@@ -37,16 +43,16 @@ public class TilePreferencesActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
 
-        int id=mRadioGroupTileSource.getCheckedRadioButtonId();
+        int id = mRadioGroupTileSource.getCheckedRadioButtonId();
 
-        if (id<0) {
+        if (id < 0) {
 
-            MainActivity.mPreferences.mTileSource=MyPreferences.TILE_SOURCE_DEFAULT;
+            mPreferences.mTileSource = MyPreferences.TILE_SOURCE_DEFAULT;
         }
         else {
 
-            RadioButton radioButton=findViewById(id);
-            MainActivity.mPreferences.mTileSource=mRadioGroupTileSource.indexOfChild(radioButton)-1;
+            RadioButton radioButton = findViewById(id);
+            mPreferences.mTileSource = mRadioGroupTileSource.indexOfChild(radioButton);
         }
     }
 

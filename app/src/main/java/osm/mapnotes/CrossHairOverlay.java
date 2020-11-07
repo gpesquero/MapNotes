@@ -35,8 +35,6 @@ public class CrossHairOverlay extends Overlay {
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(BIG_STROKE_WIDTH);
 
-        //canvas.drawBitmap(mBitmap, 0, 0, paint);
-
         canvas.drawLine(centerX-CROSS_HAIR_SIZE, centerY,
                 centerX+CROSS_HAIR_SIZE, centerY, paint);
 

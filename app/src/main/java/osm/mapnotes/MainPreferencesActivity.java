@@ -1,7 +1,5 @@
 package osm.mapnotes;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,8 +7,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import android.support.v7.app.AppCompatActivity;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 public class MainPreferencesActivity extends AppCompatActivity
@@ -18,13 +14,13 @@ public class MainPreferencesActivity extends AppCompatActivity
 
     MapNotesApplication mApp;
 
+    MyPreferences mPreferences;
+
     TextView mTextViewVersion;
 
     Button mButtonTilePreferences;
-
-    CheckBox mCheckBoxShowKeepRightErrors;
-
-    CheckBox mCheckBoxShowDebugOverlay;
+    Button mButtonKeepRightErrorsPreferences;
+    Button mButtonDebugPreferences;
 
     TextView mTextViewInternalDataPath;
     TextView mTextViewExternalDataPath;
@@ -38,27 +34,29 @@ public class MainPreferencesActivity extends AppCompatActivity
 
         mApp = (MapNotesApplication) getApplication();
 
+        mPreferences = mApp.getPreferences();
+
         mTextViewVersion=findViewById(R.id.textViewVersion);
         mTextViewVersion.setText(mApp.getAppName(this)+" v"+mApp.getAppVersion());
 
         mButtonTilePreferences=findViewById(R.id.buttonTilePreferences);
         mButtonTilePreferences.setOnClickListener(this);
 
-        mCheckBoxShowKeepRightErrors=findViewById(R.id.checkBoxShowErrors);
-        mCheckBoxShowKeepRightErrors.setChecked(MainActivity.mPreferences.mShowKeepRightErrors);
+        mButtonKeepRightErrorsPreferences=findViewById(R.id.buttonKeepRightErrorsPreferences);
+        mButtonKeepRightErrorsPreferences.setOnClickListener(this);
 
-        mCheckBoxShowDebugOverlay=findViewById(R.id.checkBoxDebug);
-        mCheckBoxShowDebugOverlay.setChecked(MainActivity.mPreferences.mShowDebugOverlay);
+        mButtonDebugPreferences=findViewById(R.id.buttonDebugPreferences);
+        mButtonDebugPreferences.setOnClickListener(this);
 
         mTextViewInternalDataPath=findViewById(R.id.textViewInternalDataPath);;
-        mTextViewInternalDataPath.setText(MainActivity.mPreferences.mInternalDataPath);
+        mTextViewInternalDataPath.setText(mPreferences.mInternalDataPath);
 
         mTextViewExternalDataPath=findViewById(R.id.textViewExternalDataPath);;
-        mTextViewExternalDataPath.setText(MainActivity.mPreferences.mExternalDataPath);
+        mTextViewExternalDataPath.setText(mPreferences.mExternalDataPath);
 
         mTextViewMarkerDatabasePath=findViewById(R.id.textViewMarkerDatabasePath);
-        mTextViewMarkerDatabasePath.setText(MainActivity.mPreferences.mInternalDataPath+
-                MainActivity.mPreferences.mMarkerDatabaseName);
+        mTextViewMarkerDatabasePath.setText(mPreferences.mInternalDataPath+
+                mPreferences.mMarkerDatabaseName);
 
         /*
         String fullPath=MainActivity.mPreferences.mDatabaseDir+
@@ -68,20 +66,21 @@ public class MainPreferencesActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        MainActivity.mPreferences.mShowKeepRightErrors=mCheckBoxShowKeepRightErrors.isChecked();
-
-        MainActivity.mPreferences.mShowDebugOverlay=mCheckBoxShowDebugOverlay.isChecked();
-    }
-
-    @Override
     public void onClick(View view) {
 
-        if (view==mButtonTilePreferences) {
+        if (view == mButtonTilePreferences) {
 
             Intent intent = new Intent(this, TilePreferencesActivity.class);
+            startActivity(intent);
+        }
+        else if (view == mButtonKeepRightErrorsPreferences) {
+
+            Intent intent = new Intent(this, KeepRightErrorsPreferencesActivity.class);
+            startActivity(intent);
+        }
+        else if (view == mButtonDebugPreferences) {
+
+            Intent intent = new Intent(this, DebugPreferencesActivity.class);
             startActivity(intent);
         }
     }

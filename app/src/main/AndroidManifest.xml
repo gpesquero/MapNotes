@@ -43,7 +43,18 @@
             android:label="@string/tile_preferences"
             android:parentActivityName=".MainPreferencesActivity"
             android:theme="@style/AppTheme">
-
+        </activity>
+        <activity
+            android:name=".KeepRightErrorsPreferencesActivity"
+            android:label="@string/tile_preferences"
+            android:parentActivityName=".MainPreferencesActivity"
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity
+            android:name=".DebugPreferencesActivity"
+            android:label="@string/debug_preferences"
+            android:parentActivityName=".MainPreferencesActivity"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 
