@@ -5,41 +5,31 @@ import android.content.Context;
 import org.osmdroid.util.BoundingBox;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheListener, */
+public class KeepRightErrorsManager implements
         KeepRightErrorsDatabaseReader.DatabaseReaderListener {
 
-    String mLastErrorString=null;
+    String mLastErrorString = null;
 
-    //String mDatabaseDir=null;
+    String mMemCacheDataString = null;
+    String mDiskDataString = null;
+    String mDatabaseDataString = null;
 
-    String mMemCacheDataString=null;
-    String mDiskDataString=null;
-    String mDatabaseDataString=null;
-
-    KeepRightErrorsManagerListener mListener = null;
-
-    //MapView mMapView=null;
-
-    //public long mElapsedTime;
+    KeepRightErrorsManagerListener mListener;
 
     private final int MEM_CACHE_MAX_OBJECTS = 100;
 
     KeepRightMemCache mKeepRightMemCache = new KeepRightMemCache(MEM_CACHE_MAX_OBJECTS);
 
-    //KeepRightDiskCache mKeepRightDiskCache = new KeepRightDiskCache(this);
-
     MapNotesApplication mApp;
 
-    KeepRightErrorsDatabaseReader mDatabaseReader = null;
+    KeepRightErrorsDatabaseReader mDatabaseReader;
 
-    ArrayList<String> mRequestList=new ArrayList<String>();
+    ArrayList<String> mRequestList = new ArrayList<>();
 
-    boolean mCancel=false;
+    boolean mCancel = false;
 
     public interface KeepRightErrorsManagerListener {
 
@@ -54,30 +44,28 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
 
         mListener = null;
 
-        //mMapView=mapView;
-
         // Create
-        mDatabaseReader = new KeepRightErrorsDatabaseReader(/*mMapView,*/ this);
+        mDatabaseReader = new KeepRightErrorsDatabaseReader(this);
 
         // Start thread
         mDatabaseReader.start();
     }
 
-    public boolean openErrorDatabase(Context context, MyPreferences preferences) {
+    public boolean openErrorDatabase(Context context) {
 
         File[] externalDirs = context.getExternalFilesDirs(null);
 
-        if (externalDirs==null) {
+        if (externalDirs == null) {
 
-            //Toast.makeText(this, "No external dirs found!!", Toast.LENGTH_LONG).show();
+            mLastErrorString = "No external dirs found!!";
 
-            mLastErrorString="No external dirs found!!";
+            mApp.logWarning(mLastErrorString);
 
             return false;
         }
 
-        String filePath=null;
-        String fileName=null;
+        String filePath;
+        String fileName = null;
 
         for (File dir : externalDirs) {
 
@@ -106,66 +94,21 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
             }
         }
 
-        if (fileName==null) {
+        if (fileName == null) {
 
-            mLastErrorString="No 'KeepRight_errors.db' file found!!";
+            mLastErrorString = "No 'KeepRight_errors.db' file found!!";
+
+            mApp.logWarning(mLastErrorString);
 
             return false;
         }
 
-        String cacheDirName=filePath;
+        if (!mDatabaseReader.openDatabase(fileName)) {
 
-        /*
-        //cacheDirName=context.getFilesDir().getAbsolutePath();
-
-        cacheDirName=Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+
-                context.getString(R.string.app_name)+"/cache";
-        */
-
-        cacheDirName=preferences.mInternalDataPath+"/cache";
-
-        boolean result=true;
-
-        File cacheDir=new File(cacheDirName);
-
-        if (!cacheDir.exists()) {
-
-            if (!cacheDir.mkdirs()) {
-
-                result=false;
-            }
+            mApp.logWarning("Error KeepRight openDatabase: "+mDatabaseReader.mLastErrorString);
         }
 
-        if (result) {
-
-            File testFile = new File(cacheDir, "prueba.dat");
-
-            try {
-
-                FileOutputStream fos = new FileOutputStream(testFile);
-
-                byte[] out = new byte[]{1, 2, 3};
-
-                fos.write(out);
-
-                fos.close();
-
-            }
-            catch (FileNotFoundException e) {
-
-                String text = e.getMessage();
-            }
-            catch (IOException e) {
-
-                String text = e.getMessage();
-            }
-        }
-
-        //mKeepRightDiskCache.setDir(filePath);
-
-        mDatabaseReader.openDatabase(fileName);
-
-        mLastErrorString=mDatabaseReader.mLastErrorString;
+        mLastErrorString = mDatabaseReader.mLastErrorString;
 
         return true;
     }
@@ -176,6 +119,11 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
     }
 
     public boolean databaseIsOpen() {
+
+        if (mDatabaseReader == null) {
+
+            return false;
+        }
 
         return mDatabaseReader.databaseIsOpen();
     }
@@ -188,45 +136,19 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
         double minLatCoord = mapBounds.getLatSouth();
         double maxLatCoord = mapBounds.getLatNorth();
 
-        long minLon = (long)Math.round(minLonCoord*10000000.0);
+        long minLon = Math.round(minLonCoord*10000000.0);
         int minLonIndex = (int)(minLon/100000);
 
-        long maxLon = (long)Math.round(maxLonCoord*10000000.0);
+        long maxLon = Math.round(maxLonCoord*10000000.0);
         int maxLonIndex = (int)(maxLon/100000);
 
-        long minLat = (long)Math.round(minLatCoord*10000000.0);
+        long minLat = Math.round(minLatCoord*10000000.0);
         int minLatIndex = (int)(minLat/100000);
 
-        long maxLat = (long)Math.round(maxLatCoord*10000000.0);
+        long maxLat = Math.round(maxLatCoord*10000000.0);
         int maxLatIndex = (int)(maxLat/100000);
 
-        //int totalCount = 0;
-        //int memHits = 0;
-
-        //mKeepRightDiskCache.resetCounters();
-        //mDatabaseReader.resetCounters();
-
-        //mKeepRightDiskCache.clearRequests();
-        //mDatabaseReader.clearRequests();
-
         clearRequests();
-
-        /*
-        for(int lat1=minLat1; lat1<=maxLat1; lat1++) {
-
-            for(int lon1=minLon1; lon1<=maxLon1; lon1++) {
-
-                for(int lat2=minLat2; lat2<=maxLat2; lat2++) {
-
-                    for(int lon2=minLon2; lon2<=maxLon2; lon2++) {
-
-                        totalCount++;
-
-                    }
-                }
-            }
-        }
-        */
 
         for(int lat=minLatIndex; lat<=maxLatIndex; lat++) {
 
@@ -243,7 +165,7 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
                     if (mDatabaseReader.isIdle()) {
 
                         // DatabaseReader is in idle state
-                        // Request data
+                        // Request data...
                         mDatabaseReader.requestData(key);
 
                         mApp.logInfo("Request DB Data");
@@ -260,30 +182,13 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
 
                     // Send data to listener
                     mListener.onDataSet(dataSet);
-
-                    //memHits++;
                 }
-
-                //totalCount++;
             }
         }
-
-        //mMemCacheDataString="Mem ("+memHits+"/"+totalCount+"/"+ mKeepRightMemCache.size()+") ";
-
-        /*
-        mDiskDataString="Disk ("+ mKeepRightDiskCache.mHits+"/"+
-                mKeepRightDiskCache.mTotalCount+") ";
-        */
 
         mDatabaseDataString="Db ("+mDatabaseReader.mRead+"/"+mDatabaseReader.mTotalCount+")";
 
         reportCacheData();
-
-        /*
-        mErrorsDataBase.getErrors(
-                minLon1, minLon2, minLon3, maxLon1, maxLon2, maxLon3,
-                minLat1, minLat2, minLat3, maxLat1, maxLat2, maxLat3);
-        */
     }
 
     private void reportCacheData() {
@@ -297,46 +202,13 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
 
     private String getKey(int lat, int lon) {
 
-        String key = String.format("%d,%d", lat, lon);
-
-        return key;
+        return String.format(Locale.US, "%d,%d", lat, lon);
     }
 
     private void clearRequests() {
 
         mRequestList.clear();
     }
-
-    /*
-    @Override
-    public void onDiskData(KeepRightErrorDataSet dataSet) {
-
-        if (mCancel)
-            return;
-
-        if (!dataSet.containsData()) {
-
-            // Data not found on disk
-            // Send request to database reader
-
-            mDatabaseReader.get(dataSet.getKey());
-        }
-        else {
-
-            // Data found on disk
-            // Include it in memory cache
-
-            mKeepRightMemCache.add(dataSet);
-
-            mDiskDataString="Disk ("+ mKeepRightDiskCache.mHits+"/"+
-                    mKeepRightDiskCache.mTotalCount+") ";
-
-            reportCacheData();
-
-            mListener.onDataSet(dataSet);
-        }
-    }
-    */
 
     @Override
     public void onDatabaseData(KeepRightErrorDataSet dataSet, long elapsedTime) {
@@ -358,13 +230,10 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
 
             // Data found on database
 
-            // Save it in disk
-            //mKeepRightDiskCache.writeToDisk(dataSet);
-
-            // Include it in cache memory
+            // Include data in cache memory
             mKeepRightMemCache.add(dataSet);
 
-            msg=String.format("KeepRight DB: Read %d errors (%.1f s)",
+            msg=String.format(Locale.US, "KeepRight DB: Read %d errors (%.1f s)",
                     dataSet.getCount(), ((double)elapsedTime)/1000.0);
 
             mApp.logInfo(msg);
@@ -376,7 +245,28 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
 
         reportCacheData();
 
+        // Report received data to listener...
         mListener.onDataSet(dataSet);
+
+        // Check if there are more pending requests...
+        if (mRequestList.size() > 0) {
+
+            if (mDatabaseReader.isIdle()) {
+
+                // Get first key from request list
+                String key = mRequestList.remove(0);
+
+                // DatabaseReader is in idle state
+                // Request data...
+                mDatabaseReader.requestData(key);
+
+                mApp.logInfo("Request DB Data");
+            }
+            else {
+
+                mApp.logError("Received DB data, but DB is not idle...");
+            }
+        }
     }
 
     void close() {
@@ -384,8 +274,6 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
         mCancel=true;
 
         clearRequests();
-
-        //mKeepRightDiskCache.close();
 
         mDatabaseReader.close();
     }
@@ -408,5 +296,10 @@ public class KeepRightErrorsManager implements /* KeepRightDiskCache.DiskCacheLi
     public int getCacheMemoryNumberOfHits() {
 
         return mKeepRightMemCache.hitCount();
+    }
+
+    public ArrayList<String> getDbInfo() {
+
+        return mDatabaseReader.getDbInfo();
     }
 }

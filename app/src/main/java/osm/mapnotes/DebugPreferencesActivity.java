@@ -20,8 +20,6 @@ public class DebugPreferencesActivity extends AppCompatActivity {
 
     ListView mListViewLog;
 
-    ArrayList<String> mLogList = new ArrayList<>();
-
     ArrayAdapter<String> mLogListAdapter;
 
     private int MAX_LOG_SIZE = 1000;
@@ -36,23 +34,6 @@ public class DebugPreferencesActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-
-            /*
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-
-            Date currentTime = new Date();
-
-            String dateString = df.format(currentTime);
-
-            mLogList.add(0, dateString + " (INFO) Log message #"+mCount);
-
-            while (mLogList.size() > MAX_LOG_SIZE) {
-
-                mLogList.remove(mLogList.size()-1);
-            }
-
-            mCount++;
-            */
 
             mLogListAdapter.notifyDataSetChanged();
 
@@ -73,15 +54,6 @@ public class DebugPreferencesActivity extends AppCompatActivity {
         mSwitchShowDebugOverlay.setChecked(mPreferences.mShowDebugOverlay);
 
         mListViewLog = findViewById(R.id.listViewLog);
-
-        /*
-        for (int i=0; i < 1000; i++) {
-
-            mLogList.add("10:00:00 (INFO) Log message #"+i);
-        }
-        */
-
-        //mLogListAdapter = new ArrayAdapter<>(this, R.layout.log_text_view, mLogList);
 
         mLogListAdapter = new ArrayAdapter<>(this, R.layout.log_text_view, app.getLogList());
 

@@ -11,7 +11,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
     </org.osmdroid.views.MapView>
@@ -21,10 +20,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         app:srcCompat="@android:drawable/ic_menu_preferences" />
 
@@ -33,10 +30,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="60dp"
-        android:layout_marginRight="60dp"
         android:layout_marginBottom="10dp"
         app:srcCompat="@drawable/ic_menu_mylocation" />
 
@@ -45,10 +40,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
@@ -57,37 +50,30 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp"
         app:srcCompat="@android:drawable/ic_menu_myplaces" />
 
     <ImageView
-        android:id="@+id/imageViewTest"
+        android:id="@+id/imageViewShowKeepRightErrors"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="70dp"
-        app:srcCompat="@android:drawable/ic_menu_more" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginBottom="10dp"
+        app:srcCompat="@android:drawable/radiobutton_off_background" />
 
     <TextView
         android:id="@+id/textViewLog1"
         android:layout_width="fill_parent"
         android:layout_height="20dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
         android:layout_marginBottom="160dp"
         android:background="#FF000000"
-        android:text="TextView"
         android:textAlignment="center"
         android:textColor="#FFFFFFFF" />
 
@@ -96,13 +82,10 @@
         android:layout_width="fill_parent"
         android:layout_height="20dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
         android:layout_marginBottom="120dp"
         android:background="#FF000000"
-        android:text="TextView"
         android:textAlignment="center"
         android:textColor="#FFFFFFFF" />
 
@@ -111,13 +94,10 @@
         android:layout_width="fill_parent"
         android:layout_height="20dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
         android:layout_marginBottom="80dp"
         android:background="#FF000000"
-        android:text="TextView"
         android:textAlignment="center"
         android:textColor="#FFFFFFFF" />
 

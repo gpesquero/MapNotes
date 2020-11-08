@@ -4,12 +4,10 @@ import java.util.ArrayList;
 
 public class KeepRightMemCache {
 
-    private final int DEFAULT_MAX_OBJECTS = 100;
+    private int mMaxObjects = 100;
 
-    private int mMaxObjects = DEFAULT_MAX_OBJECTS;
-
-    private ArrayList<String> mKeys = new ArrayList<String>();
-    private ArrayList<KeepRightErrorDataSet> mData = new ArrayList<KeepRightErrorDataSet>();
+    private final ArrayList<String> mKeys = new ArrayList<>();
+    private final ArrayList<KeepRightErrorDataSet> mData = new ArrayList<>();
 
     // Statistics
     private int mRequestCount = 0;

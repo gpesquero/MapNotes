@@ -6,8 +6,8 @@ android {
         applicationId "osm.mapnotes"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 103
-        versionName "1.03 (Nov 7, 2020)"
+        versionCode 104
+        versionName "1.04 (Nov 8, 2020)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

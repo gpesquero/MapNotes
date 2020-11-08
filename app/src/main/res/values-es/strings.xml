@@ -9,6 +9,7 @@
     <string name="clear_tile_cache">Limpiar caché de teselas</string>
     <string name="coordinates_">Coordenadas:</string>
 
+    <string name="database_info">Información DB</string>
     <string name="debug_log">Log de Debug</string>
     <string name="debug_preferences">Preferencias de Debug</string>
     <string name="delete">Borrar</string>

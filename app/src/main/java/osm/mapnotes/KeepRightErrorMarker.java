@@ -192,10 +192,6 @@ public class KeepRightErrorMarker extends Marker {
             newDraw=vectorDraw.mutate().getConstantState().newDrawable();
 
             newDraw.setColorFilter(pdcf);
-
-            //BlendModeColorFilter bmcf=new BlendModeColorFilter(Color.YELLOW, BlendMode.MULTIPLY);
-
-            //vectorDraw.mutate().setTint(Color.YELLOW);
         }
         else {
 

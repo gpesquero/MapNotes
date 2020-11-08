@@ -1,7 +1,5 @@
 package osm.mapnotes;
 
-import android.os.AsyncTask;
-
 import java.util.ArrayList;
 
 public class KeepRightErrorsDatabaseReader extends BaseThread {
@@ -14,87 +12,28 @@ public class KeepRightErrorsDatabaseReader extends BaseThread {
 
     int mState = STATE_IDLE;
 
-    //ArrayList<String> mRequestList=new ArrayList<String>();
-
     KeepRightErrorsDatabase mDatabase=null;
 
     String mLastErrorString=null;
 
-    private boolean mCancel=false;
-
     public long mStartTime;
     public long mElapsedTime;
-
-    /*
-    class DatabaseReaderTask extends AsyncTask<String, Void, KeepRightErrorDataSet> {
-
-        @Override
-        protected void onPreExecute() {
-
-            mStartTime=System.currentTimeMillis();
-        }
-
-        protected KeepRightErrorDataSet doInBackground(String... params) {
-
-            if (params.length==0) {
-
-                return new KeepRightErrorDataSet("ERROR");
-            }
-
-            String key=params[0];
-
-            KeepRightErrorDataSet dataSet=new KeepRightErrorDataSet(key);
-
-            if (mDatabase==null)
-                return dataSet;
-
-            mDatabase.getErrors(dataSet);
-
-            return dataSet;
-        }
-
-        protected void onPostExecute(KeepRightErrorDataSet result) {
-
-            if (mCancel)
-                return;
-
-            if (mListener==null)
-                return;
-
-            mElapsedTime=System.currentTimeMillis()-mStartTime;
-
-            mRead++;
-
-            mListener.onDatabaseData(result, mElapsedTime);
-
-            mState=STATE_IDLE;
-
-            launchNextRequest();
-        }
-    };
-    */
-
-    //private DatabaseReaderTask mTask=null;
 
     public interface DatabaseReaderListener {
 
         void onDatabaseData(KeepRightErrorDataSet data, long elapsedTime);
     }
 
-    public class DatabaseEvent extends ThreadEvent {
+    public static class DatabaseEvent extends ThreadEvent {
 
         public String mKey;
 
         KeepRightErrorDataSet mDataSet;
     }
 
-    //private MapView mMapView=null;
-
     private DatabaseReaderListener mListener=null;
 
-    public KeepRightErrorsDatabaseReader(/* MapView mapView, */DatabaseReaderListener listener) {
-
-        //mMapView=mapView;
+    public KeepRightErrorsDatabaseReader(DatabaseReaderListener listener) {
 
         setListener(listener);
     }
@@ -177,19 +116,9 @@ public class KeepRightErrorsDatabaseReader extends BaseThread {
         }
     }
 
-    /*
-    public void clearRequests() {
-
-        mRequestList.clear();
-
-        mRead=0;
-        mTotalCount=0;
-    }
-    */
-
     public boolean openDatabase(String fileName) {
 
-        mDatabase = new KeepRightErrorsDatabase(/*mMapView*/);
+        mDatabase = new KeepRightErrorsDatabase();
 
         if (!mDatabase.openDatabase(fileName)) {
 
@@ -221,52 +150,11 @@ public class KeepRightErrorsDatabaseReader extends BaseThread {
 
     void close() {
 
-        mCancel = true;
-
         // Interrupt thread
         interrupt();
-
-        /*
-        while(mTask.getStatus()== AsyncTask.Status.RUNNING) {
-
-            try {
-                Thread.sleep(100);
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        */
-
-        //mTask.cancel(true);
     }
 
     public void requestData(String key) {
-
-        /*
-        boolean found=false;
-
-        for(int i=0; i<mRequestList.size(); i++) {
-
-            if (mRequestList.get(i)==key) {
-
-                // Request already exists...
-
-                found=true;
-
-                break;
-            }
-        }
-
-        if (!found) {
-
-            mRequestList.add(key);
-        }
-
-        launchNextRequest();
-
-        mTotalCount++;
-        */
 
         DatabaseEvent databaseEvent = new DatabaseEvent();
 
@@ -282,25 +170,8 @@ public class KeepRightErrorsDatabaseReader extends BaseThread {
         return (mState == STATE_IDLE);
     }
 
-    /*
-    private void launchNextRequest() {
+    public ArrayList<String> getDbInfo() {
 
-        if (mState==STATE_RUNNING) {
-
-            return;
-        }
-
-        if (mRequestList.size()==0) {
-
-            return;
-        }
-
-        mState=STATE_RUNNING;
-
-        String key=mRequestList.remove(0);
-
-        mTask=new DatabaseReaderTask();
-        mTask.execute(key);
+        return mDatabase.getDbInfo();
     }
-    */
 }

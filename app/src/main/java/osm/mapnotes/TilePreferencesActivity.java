@@ -72,7 +72,7 @@ public class TilePreferencesActivity extends AppCompatActivity
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
-        if (which==DialogInterface.BUTTON_POSITIVE) {
+        if (which == DialogInterface.BUTTON_POSITIVE) {
 
             setResult(RESULT_CLEAR_TILE_CACHE);
 

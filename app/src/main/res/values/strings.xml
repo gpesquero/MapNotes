@@ -9,6 +9,7 @@
     <string name="clear_tile_cache">Clear Tile Cache</string>
     <string name="coordinates_">Coordinates:</string>
 
+    <string name="database_info">Database Info</string>
     <string name="debug_log">Debug Log</string>
     <string name="debug_preferences">Debug Preferences</string>
     <string name="delete">Delete</string>

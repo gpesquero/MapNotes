@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 public class KeepRightErrorDataSet {
 
-    private String mKey = null;
+    private String mKey;
     private ArrayList<KeepRightErrorData> mData = null;
 
     public KeepRightErrorDataSet(String key) {
@@ -55,7 +55,7 @@ public class KeepRightErrorDataSet {
 
         /*
         try {
-            FileOutputStream fos = new FileOutputStream(dataFileName);
+            FileOutputStream fos = new FileOutputStream(dataFile);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(mData);
             oos.close();
@@ -63,6 +63,8 @@ public class KeepRightErrorDataSet {
         }
         catch(FileNotFoundException e) {
 
+        }
+        catch(IOException e) {
 
         }
         */
