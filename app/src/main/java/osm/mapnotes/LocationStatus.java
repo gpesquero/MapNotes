@@ -1,48 +1,49 @@
 package osm.mapnotes;
 
-public class LocationStatus {
+public class LocationStatus
+{
+  private boolean mHasPermissions = false;
+  private boolean mProviderEnabled = false;
+  private int mStatus = -1;
+  private int mNumSats = -1;
 
-    private boolean mHasPermissions=false;
-    private boolean mProviderEnabled=false;
-    private int mStatus=-1;
-    private int mNumSats=-1;
+  public void setHasPermissions(boolean hasPermissions)
+  {
+    mHasPermissions = hasPermissions;
+  }
 
-    public void setHasPermissions(boolean hasPermissions) {
+  public boolean hasPermissions()
+  {
+    return mHasPermissions;
+  }
 
-        mHasPermissions=hasPermissions;
-    }
+  public void setProviderEnabled(boolean providerEnabled)
+  {
+    mProviderEnabled=providerEnabled;
+  }
 
-    public boolean hasPermissions() {
-        return mHasPermissions;
-    }
+  public boolean isProviderEnabled()
+  {
+    return mProviderEnabled;
+  }
 
-    public void setProviderEnabled(boolean providerEnabled) {
+  public void setStatus(int status)
+  {
+    mStatus = status;
+  }
 
-        mProviderEnabled=providerEnabled;
-    }
+  public int getStatus()
+  {
+    return mStatus;
+  }
 
-    public boolean isProviderEnabled() {
+  public void setNumSats(int numSats)
+  {
+    mNumSats = numSats;
+  }
 
-        return mProviderEnabled;
-    }
-
-    public void setStatus(int status) {
-
-        mStatus=status;
-    }
-
-    public int getStatus() {
-
-        return mStatus;
-    }
-
-    public void setNumSats(int numSats) {
-
-        mNumSats=numSats;
-    }
-
-    public int getNumSats() {
-
-        return mNumSats;
-    }
+  public int getNumSats()
+  {
+    return mNumSats;
+  }
 }

@@ -1,4 +1,4 @@
-package osm.mapnotes;
+package osm.mapnotes.keepright;
 
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -10,6 +10,7 @@ import android.graphics.drawable.VectorDrawable;
 
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import osm.mapnotes.R;
 
 public class KeepRightErrorMarker extends Marker {
 

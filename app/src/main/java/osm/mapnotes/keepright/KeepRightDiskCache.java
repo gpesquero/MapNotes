@@ -1,4 +1,4 @@
-package osm.mapnotes;
+package osm.mapnotes.keepright;
 
 import android.os.AsyncTask;
 

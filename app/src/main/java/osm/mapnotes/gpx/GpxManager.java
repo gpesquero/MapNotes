@@ -1,6 +1,7 @@
-package osm.mapnotes;
+package osm.mapnotes.gpx;
 
 import org.osmdroid.views.overlay.Polyline;
+import osm.mapnotes.preferences.MapNotesPreferences;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,11 +14,11 @@ public class GpxManager {
 
     private ArrayList<Polyline> mPolylines=new ArrayList<>();
 
-    GpxManager() {
+    public GpxManager() {
 
     }
 
-    public void readFiles(MyPreferences preferences) {
+    public void readFiles(MapNotesPreferences preferences) {
 
         String gpxDirPath=preferences.mInternalDataPath+"gpx";
 

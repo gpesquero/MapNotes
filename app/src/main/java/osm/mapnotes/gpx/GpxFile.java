@@ -1,4 +1,4 @@
-package osm.mapnotes;
+package osm.mapnotes.gpx;
 
 import android.graphics.Color;
 import android.graphics.Paint;

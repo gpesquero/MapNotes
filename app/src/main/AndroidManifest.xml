@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="osm.mapnotes">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/MainActivityTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity">
+        <activity android:exported="true" android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainPreferencesActivity"
+            android:name=".preferences.MainPreferencesActivity"
             android:label="@string/preferences"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
@@ -39,21 +39,21 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".TilePreferencesActivity"
+            android:name=".preferences.TilePreferencesActivity"
             android:label="@string/tile_preferences"
-            android:parentActivityName=".MainPreferencesActivity"
+            android:parentActivityName=".preferences.MainPreferencesActivity"
             android:theme="@style/AppTheme">
         </activity>
         <activity
-            android:name=".KeepRightErrorsPreferencesActivity"
+            android:name=".keepright.KeepRightErrorsPreferencesActivity"
             android:label="@string/tile_preferences"
-            android:parentActivityName=".MainPreferencesActivity"
+            android:parentActivityName=".preferences.MainPreferencesActivity"
             android:theme="@style/AppTheme">
         </activity>
         <activity
-            android:name=".DebugPreferencesActivity"
+            android:name=".preferences.DebugPreferencesActivity"
             android:label="@string/debug_preferences"
-            android:parentActivityName=".MainPreferencesActivity"
+            android:parentActivityName=".preferences.MainPreferencesActivity"
             android:theme="@style/AppTheme">
         </activity>
     </application>

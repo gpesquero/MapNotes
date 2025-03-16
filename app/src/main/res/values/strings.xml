@@ -1,67 +1,67 @@
 <resources>
 
-    <string name="app_name" translatable="false">MapNotes</string>
-    <string name="are_you_sure_that_you_want_to_clear_tile_cache">Are you sure that you want to clear the tile cache?</string>
-    <string name="are_you_sure_that_you_want_to_delete_marker">Are you sure that you want to delete marker?</string>
+  <string name="app_name" translatable="false">MapNotes</string>
+  <string name="are_you_sure_that_you_want_to_clear_tile_cache">Are you sure that you want to clear the tile cache?</string>
+  <string name="are_you_sure_that_you_want_to_delete_marker">Are you sure that you want to delete marker?</string>
 
-    <string name="cache_memory">Cache Memory</string>
-    <string name="clear">Clear</string>
-    <string name="clear_tile_cache">Clear Tile Cache</string>
-    <string name="coordinates_">Coordinates:</string>
+  <string name="cache_memory">Cache Memory</string>
+  <string name="clear">Clear</string>
+  <string name="clear_tile_cache">Clear Tile Cache</string>
+  <string name="coordinates_">Coordinates:</string>
 
-    <string name="database_info">Database Info</string>
-    <string name="debug_log">Debug Log</string>
-    <string name="debug_preferences">Debug Preferences</string>
-    <string name="delete">Delete</string>
-    <string name="dialog_go_to" translatable="false">Dialog_Go_To</string>
-    <string name="dialog_marker" translatable="false">Dialog_Marker</string>
+  <string name="database_info">Database Info</string>
+  <string name="debug_log">Debug Log</string>
+  <string name="debug_preferences">Debug Preferences</string>
+  <string name="delete">Delete</string>
+  <string name="dialog_go_to" translatable="false">Dialog_Go_To</string>
+  <string name="dialog_marker" translatable="false">Dialog_Marker</string>
 
-    <string name="external_data_path_">External data path:</string>
+  <string name="external_data_path_">External data path:</string>
 
-    <string name="go_to_">Go to...</string>
-    <string name="go_to_marker_">Go to marker: </string>
-    <string name="go_to_newest_marker">Go to newest marker</string>
-    <string name="go_to_oldest_marker">Go to oldest marker</string>
+  <string name="go_to_">Go to…</string>
+  <string name="go_to_marker_">Go to marker: </string>
+  <string name="go_to_newest_marker">Go to newest marker</string>
+  <string name="go_to_oldest_marker">Go to oldest marker</string>
 
-    <string name="internal_data_path_">Internal data path:</string>
+  <string name="internal_data_path_">Internal data path:</string>
 
-    <string name="keep_right_errors_preferences">KeepRight Errors Preferences</string>
-    <string name="key_debug" translatable="false">Key_Debug</string>
-    <string name="key_errors" translatable="false">Key_Errors</string>
-    <string name="key_lat" translatable="false">Key_Lat</string>
-    <string name="key_lon" translatable="false">Key_Lon</string>
-    <string name="key_preference_file" translatable="false">MapNotes_Preferences</string>
-    <string name="key_tile_source" translatable="false">Tile_Source</string>
-    <string name="key_zoom" translatable="false">Key_Zoom</string>
+  <string name="keep_right_errors_preferences">KeepRight Errors Preferences</string>
+  <string name="key_debug" translatable="false">Key_Debug</string>
+  <string name="key_errors" translatable="false">Key_Errors</string>
+  <string name="key_lat" translatable="false">Key_Lat</string>
+  <string name="key_lon" translatable="false">Key_Lon</string>
+  <string name="key_preference_file" translatable="false">MapNotes_Preferences</string>
+  <string name="key_tile_source" translatable="false">Tile_Source</string>
+  <string name="key_zoom" translatable="false">Key_Zoom</string>
 
-    <string name="latitude_">Latitude:</string>
-    <string name="loaded">Loaded</string>
-    <string name="longitude_">Longitude:</string>
+  <string name="latitude_">Latitude:</string>
+  <string name="loaded">Loaded</string>
+  <string name="longitude_">Longitude:</string>
 
-    <string name="marker">Marker</string>
-    <string name="marker_added_">Marker added !!</string>
-    <string name="marker_database_name" translatable="false">MapMarkers.db</string>
-    <string name="marker_database_path_">Marker database path:</string>
-    <string name="marker_deleted_">Marker deleted !!</string>
-    <string name="marker_name">Marker name</string>
-    <string name="marker_name_">Marker name:</string>
-    <string name="marker_name_is_empty_">Marker name is empty !!</string>
-    <string name="marker_updated_">Marker updated !!</string>
-    <string name="markers">markers</string>
+  <string name="marker">Marker</string>
+  <string name="marker_added_">Marker added !!</string>
+  <string name="marker_database_name" translatable="false">MapMarkers.db</string>
+  <string name="marker_database_path_">Marker database path:</string>
+  <string name="marker_deleted_">Marker deleted !!</string>
+  <string name="marker_name">Marker name</string>
+  <string name="marker_name_">Marker name:</string>
+  <string name="marker_name_is_empty_">Marker name is empty !!</string>
+  <string name="marker_updated_">Marker updated !!</string>
+  <string name="markers">markers</string>
 
-    <string name="preferences">Preferences</string>
-    <string name="press_again_back">"Press again 'Back' to exit..."</string>
+  <string name="preferences">Preferences</string>
+  <string name="press_again_back">"Press again 'Back' to exit…"</string>
 
-    <string name="show_debug_overlay">Show debug overlay</string>
-    <string name="show_keep_right_errors">Show KeepRight errors</string>
+  <string name="show_debug_overlay">Show debug overlay</string>
+  <string name="show_keep_right_errors">Show KeepRight errors</string>
 
-    <string name="there_are_no_markers">There are no markers</string>
-    <string name="tile_cache_cleared">Tile Cache Cleared !!</string>
-    <string name="tile_preferences">Tile Preferences</string>
-    <string name="tile_source">Tile Source</string>
-    <string name="time_stamp_">Time Stamp:</string>
-    <string name="title_">Title:</string>
+  <string name="there_are_no_markers">There are no markers</string>
+  <string name="tile_cache_cleared">Tile Cache Cleared !!</string>
+  <string name="tile_preferences">Tile Preferences</string>
+  <string name="tile_source">Tile Source</string>
+  <string name="time_stamp_">Time Stamp:</string>
+  <string name="title_">Title:</string>
 
-    <string name="zoom">Zoom</string>
+  <string name="zoom">Zoom</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package osm.mapnotes;
+package osm.mapnotes.keepright;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,7 +31,7 @@ public class KeepRightErrorDataSet {
         return mData.size();
     }
 
-    boolean containsData() {
+    public boolean containsData() {
 
         if (mData == null) {
 

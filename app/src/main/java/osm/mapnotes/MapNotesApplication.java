@@ -2,111 +2,119 @@ package osm.mapnotes;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
+
+import osm.mapnotes.keepright.KeepRightErrorsManager;
+import osm.mapnotes.preferences.MapNotesPreferences;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class MapNotesApplication extends Application {
+public class MapNotesApplication extends Application
+{
+  private MarkerDatabase mMarkerDatabase = null;
 
-    private MarkerDatabase mMarkerDatabase = null;
+  private KeepRightErrorsManager mKeepRightErrorsManager = null;
 
-    private KeepRightErrorsManager mKeepRightErrorsManager = null;
+  MapNotesPreferences mPreferences = null;
 
-    MyPreferences mPreferences = null;
+  private final ArrayList<String> mLogList = new ArrayList<>();
 
-    private final ArrayList<String> mLogList = new ArrayList<>();
+  SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);
 
-    SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);
+  @Override
+  public void onCreate()
+  {
+    super.onCreate();
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    mMarkerDatabase = new MarkerDatabase();
 
-        mMarkerDatabase = new MarkerDatabase();
+    mKeepRightErrorsManager = new KeepRightErrorsManager(this);
+  }
 
-        mKeepRightErrorsManager = new KeepRightErrorsManager(this);
+  public void closeApp()
+  {
+    Log.w("MapNotes_destroy", "closeApp()");
+
+    if (mKeepRightErrorsManager != null)
+    {
+      // Close KeepRight Error Manager.
+      mKeepRightErrorsManager.close();
+      mKeepRightErrorsManager = null;
     }
 
-    public void destroy() {
-
-        if (mKeepRightErrorsManager != null) {
-
-            // Close KeepRight Error Manager
-            mKeepRightErrorsManager.close();
-        }
-
-        if (mMarkerDatabase != null) {
-
-            mMarkerDatabase.close();
-        }
-
-        if (mPreferences != null) {
-
-            mPreferences.savePreferences(this);
-        }
+    if (mMarkerDatabase != null)
+    {
+      mMarkerDatabase.close();
+      mMarkerDatabase = null;
     }
 
-    public MyPreferences getPreferences() {
+    if (mPreferences != null)
+    {
+      mPreferences.savePreferences(this);
+      mPreferences = null;
+    }
+  }
 
-        if (mPreferences == null) {
-
-            mPreferences = new MyPreferences();
-
-            mPreferences.loadPreferences(this);
-
-        }
-
-        return mPreferences;
+  public MapNotesPreferences getPreferences()
+  {
+    if (mPreferences == null)
+    {
+      mPreferences = new MapNotesPreferences();
+      mPreferences.loadPreferences(this);
     }
 
-    public String getAppName(Context context) {
+    return mPreferences;
+  }
 
-        return context.getString(R.string.app_name);
-    }
+  public String getAppName(Context context)
+  {
+    return context.getString(R.string.app_name);
+  }
 
-    public String getAppVersion() {
+  public String getAppVersion()
+  {
+    return BuildConfig.VERSION_NAME;
+  }
 
-        return BuildConfig.VERSION_NAME;
-    }
+  public MarkerDatabase getMarkerDatabase()
+  {
+    return mMarkerDatabase;
+  }
 
-    public MarkerDatabase getMarkerDatabase() {
+  public KeepRightErrorsManager getKeepRightErrorManager()
+  {
+    return mKeepRightErrorsManager;
+  }
 
-        return mMarkerDatabase;
-    }
+  private void log(String logType, String text)
+  {
+    Date currentTime = new Date();
 
-    public KeepRightErrorsManager getKeepRightErrorManager() {
+    String timeString = mDateFormat.format(currentTime);
 
-        return mKeepRightErrorsManager;
-    }
+    mLogList.add(0, timeString + " " + logType + " " + text);
+  }
 
-    private void log(String logType, String text) {
+  public ArrayList<String> getLogList()
+  {
+    return mLogList;
+  }
 
-        Date currentTime = new Date();
+  public void logError(String text)
+  {
+    log("<<<ERROR>>>", text);
+  }
 
-        String timeString = mDateFormat.format(currentTime);
+  public void logWarning(String text)
+  {
+    log("<<<WARNING>>>", text);
+  }
 
-        mLogList.add(0, timeString+" "+logType+" "+text);
-    }
-
-    public ArrayList<String> getLogList() {
-
-        return mLogList;
-    }
-
-    public void logError(String text) {
-
-        log("<<<ERROR>>>", text);
-    }
-
-    public void logWarning(String text) {
-
-        log("<<<WARNING>>>", text);
-    }
-
-    public void logInfo(String text) {
-
-        log("<INFO>", text);
-    }
+  public void logInfo(String text)
+  {
+    log("<INFO>", text);
+  }
 }

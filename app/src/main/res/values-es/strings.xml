@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="are_you_sure_that_you_want_to_clear_tile_cache">¿Está seguro que quiere limpiar la caché de teselas?</string>
-    <string name="are_you_sure_that_you_want_to_delete_marker">¿Está seguro que quiere borrar el marcador?</string>
+  <string name="are_you_sure_that_you_want_to_clear_tile_cache">¿Estás seguro que quieres limpiar la caché de teselas?</string>
+  <string name="are_you_sure_that_you_want_to_delete_marker">¿Estás seguro que quieres borrar el marcador?</string>
 
-    <string name="cache_memory">Memoria Cache</string>
-    <string name="clear">Limpiar</string>
-    <string name="clear_tile_cache">Limpiar caché de teselas</string>
-    <string name="coordinates_">Coordenadas:</string>
+  <string name="cache_memory">Memoria Cache</string>
+  <string name="clear">Limpiar</string>
+  <string name="clear_tile_cache">Limpiar caché de teselas</string>
+  <string name="coordinates_">Coordenadas:</string>
 
-    <string name="database_info">Información DB</string>
-    <string name="debug_log">Log de Debug</string>
-    <string name="debug_preferences">Preferencias de Debug</string>
-    <string name="delete">Borrar</string>
+  <string name="database_info">Información DB</string>
+  <string name="debug_log">Log de Debug</string>
+  <string name="debug_preferences">Preferencias de Debug</string>
+  <string name="delete">Borrar</string>
 
-    <string name="external_data_path_">Path datos externos:</string>
+  <string name="external_data_path_">Path datos externos:</string>
 
-    <string name="go_to_">Ir a...</string>
-    <string name="go_to_marker_">Ir al marcador: </string>
-    <string name="go_to_newest_marker">Ir al marcador más nuevo</string>
-    <string name="go_to_oldest_marker">Ir al marcador más antiguo</string>
+  <string name="go_to_">Ir a…</string>
+  <string name="go_to_marker_">Ir al marcador: </string>
+  <string name="go_to_newest_marker">Ir al marcador más nuevo</string>
+  <string name="go_to_oldest_marker">Ir al marcador más antiguo</string>
 
-    <string name="internal_data_path_">Path datos internos:</string>
+  <string name="internal_data_path_">Path datos internos:</string>
 
-    <string name="keep_right_errors_preferences">Preferencias de errores de KeepRight</string>
+  <string name="keep_right_errors_preferences">Preferencias de errores de KeepRight</string>
 
-    <string name="latitude_">Latitud:</string>
-    <string name="loaded">Cargados</string>
-    <string name="longitude_">Longitud:</string>
+  <string name="latitude_">Latitud:</string>
+  <string name="loaded">Cargados</string>
+  <string name="longitude_">Longitud:</string>
 
-    <string name="marker">Marcador</string>
-    <string name="marker_added_">¡¡ Marcador añadido !!</string>
-    <string name="marker_database_path_">Path base de datos de marcadores:</string>
-    <string name="marker_deleted_">¡¡ Marcador borrado !!</string>
-    <string name="marker_name">Nombre del marcador</string>
-    <string name="marker_name_">Nombre del marcador:</string>
-    <string name="marker_name_is_empty_">¡¡ El nombre del marcador está vacío !!</string>
-    <string name="marker_updated_">¡¡ Marcador actualizado !!</string>
-    <string name="markers">marcadores</string>
+  <string name="marker">Marcador</string>
+  <string name="marker_added_">¡¡ Marcador añadido !!</string>
+  <string name="marker_database_path_">Path base de datos de marcadores:</string>
+  <string name="marker_deleted_">¡¡ Marcador borrado !!</string>
+  <string name="marker_name">Nombre del marcador</string>
+  <string name="marker_name_">Nombre del marcador:</string>
+  <string name="marker_name_is_empty_">¡¡ El nombre del marcador está vacío !!</string>
+  <string name="marker_updated_">¡¡ Marcador actualizado !!</string>
+  <string name="markers">marcadores</string>
 
-    <string name="preferences">Preferencias</string>
-    <string name="press_again_back">Pulse otra vez \'Atrás\' para salir...</string>
+  <string name="preferences">Preferencias</string>
+  <string name="press_again_back">Pulsa otra vez \'Atrás\' para salir…</string>
 
-    <string name="show_debug_overlay">Mostrar overlay de debug</string>
-    <string name="show_keep_right_errors">Mostrar errores KeepRight</string>
+  <string name="show_debug_overlay">Mostrar overlay de debug</string>
+  <string name="show_keep_right_errors">Mostrar errores KeepRight</string>
 
-    <string name="there_are_no_markers">No hay marcadores</string>
-    <string name="tile_cache_cleared">¡¡ Limpiada caché de teselas !!</string>
-    <string name="tile_preferences">Preferencias de teselas</string>
-    <string name="tile_source">Fuente de las teselas</string>
-    <string name="time_stamp_">Marca temporal:</string>
-    <string name="title_">Título:</string>
+  <string name="there_are_no_markers">No hay marcadores</string>
+  <string name="tile_cache_cleared">¡¡ Limpiada caché de teselas !!</string>
+  <string name="tile_preferences">Preferencias de teselas</string>
+  <string name="tile_source">Fuente de las teselas</string>
+  <string name="time_stamp_">Marca temporal:</string>
+  <string name="title_">Título:</string>
 
-    <string name="zoom">Zoom</string>
+  <string name="zoom">Zoom</string>
 
 </resources>

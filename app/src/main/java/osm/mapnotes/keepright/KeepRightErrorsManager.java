@@ -1,122 +1,115 @@
-package osm.mapnotes;
+package osm.mapnotes.keepright;
 
 import android.content.Context;
 
 import org.osmdroid.util.BoundingBox;
+import osm.mapnotes.MapNotesApplication;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class KeepRightErrorsManager implements
-        KeepRightErrorsDatabaseReader.DatabaseReaderListener {
+public class KeepRightErrorsManager
+  implements KeepRightErrorsDatabaseReader.DatabaseReaderListener
+{
+  public String mLastErrorString = null;
 
-    String mLastErrorString = null;
+  String mMemCacheDataString = null;
+  String mDiskDataString = null;
+  String mDatabaseDataString = null;
 
-    String mMemCacheDataString = null;
-    String mDiskDataString = null;
-    String mDatabaseDataString = null;
+  KeepRightErrorsManagerListener mListener;
 
-    KeepRightErrorsManagerListener mListener;
+  private final int MEM_CACHE_MAX_OBJECTS = 100;
 
-    private final int MEM_CACHE_MAX_OBJECTS = 100;
+  KeepRightMemCache mKeepRightMemCache = new KeepRightMemCache(MEM_CACHE_MAX_OBJECTS);
 
-    KeepRightMemCache mKeepRightMemCache = new KeepRightMemCache(MEM_CACHE_MAX_OBJECTS);
+  MapNotesApplication mApp;
 
-    MapNotesApplication mApp;
+  KeepRightErrorsDatabaseReader mDatabaseReader;
 
-    KeepRightErrorsDatabaseReader mDatabaseReader;
+  ArrayList<String> mRequestList = new ArrayList<>();
 
-    ArrayList<String> mRequestList = new ArrayList<>();
+  boolean mCancel = false;
 
-    boolean mCancel = false;
+  public interface KeepRightErrorsManagerListener
+  {
+    void onDataSet(KeepRightErrorDataSet dataSet);
+    void reportCacheData(String data);
+    void reportDatabaseMsg(String message);
+  }
 
-    public interface KeepRightErrorsManagerListener {
+  public KeepRightErrorsManager(MapNotesApplication app)
+  {
+    mApp = app;
 
-        void onDataSet(KeepRightErrorDataSet dataSet);
-        void reportCacheData(String data);
-        void reportDatabaseMsg(String message);
+    mListener = null;
+
+    // Create
+    mDatabaseReader = new KeepRightErrorsDatabaseReader(this);
+
+    // Start thread
+    mDatabaseReader.start();
+  }
+
+  public boolean openErrorDatabase(Context context)
+  {
+    File[] externalDirs = context.getExternalFilesDirs(null);
+
+    if (externalDirs == null)
+    {
+      mLastErrorString = "No external dirs found!!";
+
+      mApp.logWarning(mLastErrorString);
+
+      return false;
     }
 
-    public KeepRightErrorsManager(MapNotesApplication app) {
+    String filePath;
+    String fileName = null;
 
-        mApp = app;
+    for (File dir : externalDirs)
+    {
+      filePath = dir.getAbsolutePath();
 
-        mListener = null;
+      int pos = filePath.indexOf("Android/data");
 
-        // Create
-        mDatabaseReader = new KeepRightErrorsDatabaseReader(this);
+      if (pos>=0)
+        filePath = filePath.substring(0, pos);
 
-        // Start thread
-        mDatabaseReader.start();
+      filePath += "MapNotes/";
+
+      fileName = filePath+"keepright_errors.db";
+
+      File dbFile = new File(fileName);
+
+      if (dbFile.exists())
+        break;
+      else
+        fileName = null;
     }
 
-    public boolean openErrorDatabase(Context context) {
+    if (fileName == null)
+    {
+      mLastErrorString = "No 'KeepRight_errors.db' file found!!";
 
-        File[] externalDirs = context.getExternalFilesDirs(null);
+      mApp.logWarning(mLastErrorString);
 
-        if (externalDirs == null) {
-
-            mLastErrorString = "No external dirs found!!";
-
-            mApp.logWarning(mLastErrorString);
-
-            return false;
-        }
-
-        String filePath;
-        String fileName = null;
-
-        for (File dir : externalDirs) {
-
-            filePath=dir.getAbsolutePath();
-
-            int pos=filePath.indexOf("Android/data");
-
-            if (pos>=0) {
-
-                filePath=filePath.substring(0, pos);
-            }
-
-            filePath+="MapNotes/";
-
-            fileName=filePath+"keepright_errors.db";
-
-            File dbFile=new File(fileName);
-
-            if (dbFile.exists()) {
-
-                break;
-            }
-            else {
-
-                fileName=null;
-            }
-        }
-
-        if (fileName == null) {
-
-            mLastErrorString = "No 'KeepRight_errors.db' file found!!";
-
-            mApp.logWarning(mLastErrorString);
-
-            return false;
-        }
-
-        if (!mDatabaseReader.openDatabase(fileName)) {
-
-            mApp.logWarning("Error KeepRight openDatabase: "+mDatabaseReader.mLastErrorString);
-        }
-
-        mLastErrorString = mDatabaseReader.mLastErrorString;
-
-        return true;
+      return false;
     }
 
-    public void setListener(KeepRightErrorsManagerListener listener) {
+    if (!mDatabaseReader.openDatabase(fileName))
+      mApp.logWarning("Error KeepRight openDatabase: " + mDatabaseReader.mLastErrorString);
 
-        mListener = listener;
-    }
+    mLastErrorString = mDatabaseReader.mLastErrorString;
+
+    return true;
+  }
+
+  public void setListener(KeepRightErrorsManagerListener listener)
+  {
+    mListener = listener;
+  }
 
     public boolean databaseIsOpen() {
 
@@ -269,7 +262,7 @@ public class KeepRightErrorsManager implements
         }
     }
 
-    void close() {
+    public void close() {
 
         mCancel=true;
 
