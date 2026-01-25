@@ -6,51 +6,59 @@ import osm.mapnotes.preferences.MapNotesPreferences;
 import java.io.File;
 import java.util.ArrayList;
 
-public class GpxManager {
+public class GpxManager
+{
+  private String mLastErrorString;
 
-    public String mLastErrorString=null;
+  private int mGpxFileCount = 0;
 
-    private int mGpxFileCount=0;
+  private ArrayList<Polyline> mPolylines = new ArrayList<>();
 
-    private ArrayList<Polyline> mPolylines=new ArrayList<>();
+  public GpxManager()
+  {
+  }
 
-    public GpxManager() {
+  public String getLastErrorString()
+  {
+    if (mLastErrorString == null)
+      mLastErrorString = "null";
 
-    }
+    return mLastErrorString;
+  }
 
-    public void readFiles(MapNotesPreferences preferences) {
+  public void readFiles(MapNotesPreferences preferences)
+  {
+    String gpxDirPath = preferences.mDataPath + "gpx";
 
-        String gpxDirPath=preferences.mInternalDataPath+"gpx";
+    File gpxDir = new File(gpxDirPath);
 
-        File gpxDir=new File(gpxDirPath);
+    File[] gpxFiles = gpxDir.listFiles();
 
-        File[] gpxFiles=gpxDir.listFiles();
+    if (gpxFiles != null)
+    {
+      for (File file : gpxFiles)
+      {
+        String filePath = file.getAbsolutePath();
 
-        if (gpxFiles!=null) {
+        if (filePath.endsWith(".gpx"))
+        {
+          GpxFile gpxFile = new GpxFile();
 
-            for (File file : gpxFiles) {
+          if (gpxFile.openFile(filePath))
+          {
+            mGpxFileCount++;
 
-                String filePath = file.getAbsolutePath();
-
-                if (filePath.endsWith(".gpx")) {
-
-                    GpxFile gpxFile = new GpxFile();
-
-                    if (gpxFile.openFile(filePath)) {
-
-                        mGpxFileCount++;
-
-                        mPolylines.addAll(gpxFile.getPolylines());
-                    }
-                }
-            }
+            mPolylines.addAll(gpxFile.getPolylines());
+          }
         }
-
-        mLastErrorString="Loaded "+mGpxFileCount+" Gpx files";
+      }
     }
 
-    public ArrayList<Polyline> getPolylines() {
+    mLastErrorString = "Loaded " + mGpxFileCount + " Gpx files";
+  }
 
-        return mPolylines;
-    }
+  public ArrayList<Polyline> getPolylines()
+  {
+    return mPolylines;
+  }
 }

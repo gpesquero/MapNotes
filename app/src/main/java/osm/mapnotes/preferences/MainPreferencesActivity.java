@@ -25,8 +25,8 @@ public class MainPreferencesActivity extends AppCompatActivity
   Button mButtonKeepRightErrorsPreferences;
   Button mButtonDebugPreferences;
 
-  TextView mTextViewInternalDataPath;
-  TextView mTextViewExternalDataPath;
+  TextView mTextViewDataPath;
+  //TextView mTextViewExternalDataPath;
   TextView mTextViewMarkerDatabasePath;
 
   @Override
@@ -52,14 +52,14 @@ public class MainPreferencesActivity extends AppCompatActivity
     mButtonDebugPreferences=findViewById(R.id.buttonDebugPreferences);
     mButtonDebugPreferences.setOnClickListener(this);
 
-    mTextViewInternalDataPath=findViewById(R.id.textViewInternalDataPath);;
-    mTextViewInternalDataPath.setText(mPreferences.mInternalDataPath);
+    mTextViewDataPath=findViewById(R.id.textViewDataPath);;
+    mTextViewDataPath.setText(mPreferences.mDataPath);
 
-    mTextViewExternalDataPath=findViewById(R.id.textViewExternalDataPath);;
-    mTextViewExternalDataPath.setText(mPreferences.mExternalDataPath);
+    //mTextViewExternalDataPath=findViewById(R.id.textViewExternalDataPath);;
+    //mTextViewExternalDataPath.setText(mPreferences.mExternalDataPath);
 
     mTextViewMarkerDatabasePath=findViewById(R.id.textViewMarkerDatabasePath);
-    mTextViewMarkerDatabasePath.setText(mPreferences.mInternalDataPath +
+    mTextViewMarkerDatabasePath.setText(mPreferences.mDataPath +
       mPreferences.mMarkerDatabaseName);
 
     /*

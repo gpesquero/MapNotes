@@ -9,19 +9,16 @@
   <string name="clear_tile_cache">Limpiar caché de teselas</string>
   <string name="coordinates_">Coordenadas:</string>
 
+  <string name="data_path_">Path de datos:</string>
   <string name="database_info">Información DB</string>
   <string name="debug_log">Log de Debug</string>
   <string name="debug_preferences">Preferencias de Debug</string>
   <string name="delete">Borrar</string>
 
-  <string name="external_data_path_">Path datos externos:</string>
-
   <string name="go_to_">Ir a…</string>
   <string name="go_to_marker_">Ir al marcador: </string>
   <string name="go_to_newest_marker">Ir al marcador más nuevo</string>
   <string name="go_to_oldest_marker">Ir al marcador más antiguo</string>
-
-  <string name="internal_data_path_">Path datos internos:</string>
 
   <string name="keep_right_errors_preferences">Preferencias de errores de KeepRight</string>
 

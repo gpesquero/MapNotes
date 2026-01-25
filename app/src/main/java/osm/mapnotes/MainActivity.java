@@ -104,13 +104,12 @@ public class MainActivity extends AppCompatActivity
   final private static int REQUEST_CODE_EXTERNAL_STORAGE = 1;
   final private static int REQUEST_CODE_PREFERENCES = 2;
 
-  int mZoomLevel=0;
+  int mZoomLevel = 0;
 
   // Controls.
-
   ImageView mImageViewLocation = null;
   ImageView mImageViewPreferences = null;
-  ImageView mImageViewBookmark= null;
+  ImageView mImageViewAddMarker = null;
   ImageView mImageViewGoTo = null;
   ImageView mImageViewShowKeepRightErrors = null;
 
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity
 
   final private static float BOUNDING_BOX_SCALE = (float)1.5;
 
-  final private static int MIN_ERRORS_ZOOM_LEVEL=16;
+  final private static int MIN_ERRORS_ZOOM_LEVEL = 16;
 
   // Map movement delay.
   final int MAP_LISTENER_DELAY = 500;
@@ -189,8 +188,8 @@ public class MainActivity extends AppCompatActivity
     mImageViewPreferences = findViewById(R.id.imageViewPreferences);
     mImageViewPreferences.setOnClickListener(this);
 
-    mImageViewBookmark = findViewById(R.id.imageViewAddMarker);
-    mImageViewBookmark.setOnClickListener(this);
+    mImageViewAddMarker = findViewById(R.id.imageViewAddMarker);
+    mImageViewAddMarker.setOnClickListener(this);
 
     mImageViewGoTo = findViewById(R.id.imageViewGoTo);
     mImageViewGoTo.setOnClickListener(this);
@@ -264,6 +263,7 @@ public class MainActivity extends AppCompatActivity
     else
       mErrorsManager = null;
 
+    /*
     if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
     {
@@ -274,12 +274,13 @@ public class MainActivity extends AppCompatActivity
     }
     else
     {
-      loadMarkers();
+    */
 
-      openGpxFiles();
+    loadMarkers();
 
-      openErrorDatabase();
-    }
+    openGpxFiles();
+
+    openErrorDatabase();
 
     if (mPreferences.mShowDebugOverlay)
     {
@@ -303,13 +304,23 @@ public class MainActivity extends AppCompatActivity
     else
       mTextViewLog1.setText("First Time=false");
 
-    String text;
+    String toastText;
 
-    text = "Markers database: "+mMarkerDatabase.mLastErrorString + "\n";
+    toastText = "Markers database: ";
 
-    text += "GpxManager: "+mGpxManager.mLastErrorString;
+    if (mMarkerDatabase == null)
+      toastText += "null" + "\n";
+    else
+      toastText += mMarkerDatabase.getLastErrorString() + "\n";
 
-    Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    toastText += "GpxManager: ";
+
+    if (mGpxManager == null)
+      toastText += "null";
+    else
+      toastText += mGpxManager.getLastErrorString();
+
+    Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
   }
 
   private void updateIcons()
@@ -344,7 +355,8 @@ public class MainActivity extends AppCompatActivity
     if (markers != null)
     {
       // Map database is ok.
-      mMarkerDatabase.mLastErrorString = getString(R.string.loaded) + " " + markers.size() + " " + getString(R.string.markers) + "...";
+      mMarkerDatabase.setLastErrorString(getString(R.string.loaded) + " " + markers.size() +
+                                         " " + getString(R.string.markers) + "...");
 
       Iterator<MyMarker> iter = markers.iterator();
 
@@ -456,16 +468,6 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
-  protected void onDestroy()
-  {
-    Log.w("MapNotes_destroy", "onDestroy");
-
-    closeActivity();
-
-    super.onDestroy();
-  }
-
-  @Override
   public void onBackPressed()
   {
     Log.w("MapNotes_destroy", "onBackPressed");
@@ -492,8 +494,6 @@ public class MainActivity extends AppCompatActivity
 
   private void closeActivity()
   {
-    Log.d("MapNotes_destroy", "closeActivity");
-
     if (mErrorsManager != null)
     {
       mErrorsManager.setListener(null);
@@ -662,7 +662,7 @@ public class MainActivity extends AppCompatActivity
 
       startActivityForResult(intent, REQUEST_CODE_PREFERENCES);
     }
-    else if (view == mImageViewBookmark)
+    else if (view == mImageViewAddMarker)
     {
       GeoPoint center = (GeoPoint)mMapView.getMapCenter();
 
@@ -705,8 +705,17 @@ public class MainActivity extends AppCompatActivity
   {
     super.onPause();
 
+    if (mPreferences != null)
+    {
+      mPreferences.mLon = (float) mMapView.getMapCenter().getLongitude();
+      mPreferences.mLat = (float) mMapView.getMapCenter().getLatitude();
+      mPreferences.mZoom = (float) mMapView.getZoomLevelDouble();
+    }
+
+    /*
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     Configuration.getInstance().save(this, prefs);
+    */
 
     mMapView.onPause();
   }
@@ -720,8 +729,14 @@ public class MainActivity extends AppCompatActivity
 
     setMapTileSource();
 
+    /*
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+    */
+
+    mMapController.setZoom(mPreferences.mZoom);
+    GeoPoint startPoint = new GeoPoint(mPreferences.mLat, mPreferences.mLon);
+    mMapController.setCenter(startPoint);
 
     mMapView.onResume();
   }
@@ -785,7 +800,7 @@ public class MainActivity extends AppCompatActivity
     marker.setId(markerDataBundle.getString(MarkerDialogFragment.KEY_TIME_STAMP));
 
     if (!mMarkerDatabase.addMarker(marker))
-      Toast.makeText(this, "MapDatabase.addMarker() error: " + mMarkerDatabase.mLastErrorString,
+      Toast.makeText(this, "MapDatabase.addMarker() error: " + mMarkerDatabase.getLastErrorString(),
                      Toast.LENGTH_LONG).show();
     else
     {
@@ -828,7 +843,7 @@ public class MainActivity extends AppCompatActivity
 
             if (!mMarkerDatabase.deleteMarker(marker))
               toastMessage = "MapDatabase.deleteMarker() error_circle: " +
-                             mMarkerDatabase.mLastErrorString;
+                             mMarkerDatabase.getLastErrorString();
             else
               toastMessage = getString(R.string.marker_deleted_);
           }
@@ -877,7 +892,7 @@ public class MainActivity extends AppCompatActivity
           if (!mMarkerDatabase.updateMarker(marker))
           {
             Toast.makeText(this, "MapDatabase.updateMarker() error_circle: " +
-                                 mMarkerDatabase.mLastErrorString, Toast.LENGTH_LONG).show();
+                                 mMarkerDatabase.getLastErrorString(), Toast.LENGTH_LONG).show();
           }
           else
           {

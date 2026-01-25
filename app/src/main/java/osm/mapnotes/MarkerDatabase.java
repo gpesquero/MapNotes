@@ -34,11 +34,24 @@ public class MarkerDatabase
 
   SQLiteDatabase mDatabase = null;
 
-  public String mLastErrorString;
+  private String mLastErrorString;
 
   public MarkerDatabase()
   {
-    mLastErrorString = "Marker database is closed";
+    mLastErrorString = "Database is closed";
+  }
+
+  public String getLastErrorString()
+  {
+    if (mLastErrorString == null)
+      mLastErrorString = "Database is closed";
+
+    return mLastErrorString;
+  }
+
+  public void setLastErrorString(String errorString)
+  {
+    mLastErrorString = errorString;
   }
 
   public boolean openOrCreate(String markerDatabasePath)
@@ -82,6 +95,8 @@ public class MarkerDatabase
       mDatabase.close();
 
       mDatabase = null;
+
+      mLastErrorString = "Database is closed";
     }
   }
 

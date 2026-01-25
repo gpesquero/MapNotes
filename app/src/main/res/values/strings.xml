@@ -9,6 +9,7 @@
   <string name="clear_tile_cache">Clear Tile Cache</string>
   <string name="coordinates_">Coordinates:</string>
 
+  <string name="data_path_">Data path:</string>
   <string name="database_info">Database Info</string>
   <string name="debug_log">Debug Log</string>
   <string name="debug_preferences">Debug Preferences</string>
@@ -16,14 +17,10 @@
   <string name="dialog_go_to" translatable="false">Dialog_Go_To</string>
   <string name="dialog_marker" translatable="false">Dialog_Marker</string>
 
-  <string name="external_data_path_">External data path:</string>
-
   <string name="go_to_">Go to…</string>
   <string name="go_to_marker_">Go to marker: </string>
   <string name="go_to_newest_marker">Go to newest marker</string>
   <string name="go_to_oldest_marker">Go to oldest marker</string>
-
-  <string name="internal_data_path_">Internal data path:</string>
 
   <string name="keep_right_errors_preferences">KeepRight Errors Preferences</string>
   <string name="key_debug" translatable="false">Key_Debug</string>

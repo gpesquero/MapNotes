@@ -6,8 +6,8 @@ android {
         applicationId "osm.mapnotes"
         minSdkVersion 23
         targetSdkVersion 35
-        versionCode 105
-        versionName "1.05 (Mar 14, 2025)"
+        versionCode 106
+        versionName "1.06 (Jan 25, 2026)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -29,7 +29,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'org.osmdroid:osmdroid-android:6.1.17'
+    implementation 'org.osmdroid:osmdroid-android:6.1.20'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
 }
 java {

@@ -36,26 +36,14 @@ public class MapNotesApplication extends Application
 
   public void closeApp()
   {
-    Log.w("MapNotes_destroy", "closeApp()");
-
     if (mKeepRightErrorsManager != null)
-    {
-      // Close KeepRight Error Manager.
       mKeepRightErrorsManager.close();
-      mKeepRightErrorsManager = null;
-    }
 
     if (mMarkerDatabase != null)
-    {
       mMarkerDatabase.close();
-      mMarkerDatabase = null;
-    }
 
     if (mPreferences != null)
-    {
       mPreferences.savePreferences(this);
-      mPreferences = null;
-    }
   }
 
   public MapNotesPreferences getPreferences()

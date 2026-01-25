@@ -21,30 +21,23 @@ public class MapNotesPreferences
   public int mTileSource=0;
 
   public final static int TILE_SOURCE_DEFAULT = 0;
-  //public final static int TILE_SOURCE_FIRST = 0;
   public final static int TILE_SOURCE_MAPNIK = 0;
   public final static int TILE_SOURCE_HIKEBIKEMAP = 1;
   public final static int TILE_SOURCE_PUBLIC_TRANSPORT = 2;
   public final static int TILE_SOURCE_USGS_MAP = 3;
   public final static int TILE_SOURCE_USGS_TOPO = 4;
   public final static int TILE_SOURCE_OPEN_TOPO = 5;
-  //public final static int TILE_SOURCE_LAST = 5;
 
-  public String mInternalDataPath=null;
-  public String mExternalDataPath=null;
-  public String mMarkerDatabaseName=null;
-  public String mMarkerDatabasePath=null;
+  //public String mInternalDataPath;
+  public String mDataPath;
+  public String mMarkerDatabaseName;
+  public String mMarkerDatabasePath;
 
-  private boolean mInternalDataPathIsOk=false;
-  private boolean mExternalDataPathIsOk=false;
+  private boolean mDataPathIsOk = false;
+  //private boolean mExternalDataPathIsOk = false;
 
   public void loadPreferences(Context context)
   {
-    /*
-    Configuration.getInstance().load(context,
-                                     PreferenceManager.getDefaultSharedPreferences(context));
-    */
-
     SharedPreferences sharedPref = context.getSharedPreferences(
       context.getString(R.string.key_preference_file), Context.MODE_PRIVATE);
 
@@ -58,40 +51,45 @@ public class MapNotesPreferences
 
     mTileSource = sharedPref.getInt(context.getString(R.string.key_tile_source), TILE_SOURCE_MAPNIK);
 
-    // Internal Data Path
+    // Data Path.
 
-    mInternalDataPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+    mDataPath = context.getExternalFilesDir(null) + "/" +
+                context.getString(R.string.app_name) + "/";
+
+    /*
+    mDataPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
       context.getString(R.string.app_name) + "/";
+    */
 
     mMarkerDatabaseName = context.getString(R.string.marker_database_name);
 
-    mMarkerDatabasePath = mInternalDataPath + mMarkerDatabaseName;
+    mMarkerDatabasePath = mDataPath + mMarkerDatabaseName;
 
-    File internalDir = new File(mInternalDataPath);
+    File internalDir = new File(mDataPath);
 
-    mInternalDataPathIsOk = false;
+    mDataPathIsOk = false;
 
     if (!internalDir.exists())
     {
       if (!internalDir.mkdir())
       {
-        mInternalDataPathIsOk = false;
+        mDataPathIsOk = false;
 
         // mLastErrorString="Cannot create database dir <"+databaseDir+">";
         // return false;
       }
       else
-        mInternalDataPathIsOk = true;
+        mDataPathIsOk = true;
     }
     else if (!internalDir.isDirectory())
     {
-      mInternalDataPathIsOk = false;
+      mDataPathIsOk = false;
 
       // mLastErrorString="<"+databaseDir+"> is not a directory";
       // return false;
     }
     else
-      mInternalDataPathIsOk = true;
+      mDataPathIsOk = true;
   }
 
   public void savePreferences(Context context)

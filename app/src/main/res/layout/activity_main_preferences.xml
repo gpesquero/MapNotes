@@ -49,51 +49,27 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:text="@string/internal_data_path_"/>
+        android:text="@string/data_path_"/>
 
     <TextView
-        android:id="@+id/textViewInternalDataPath"
+        android:id="@+id/textViewDataPath"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="2dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:maxLines="3"
         android:gravity="center"
-        android:background="@drawable/textview_border"
-        android:text="TextView"/>
+        android:background="@drawable/textview_border"/>
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:textStyle="bold"
-        android:text="@string/external_data_path_"/>
-
-    <TextView
-        android:id="@+id/textViewExternalDataPath"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="2dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:background="@drawable/textview_border"
-        android:text="TextView"/>
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
         android:text="@string/marker_database_path_"/>
@@ -101,14 +77,12 @@
     <TextView
         android:id="@+id/textViewMarkerDatabasePath"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="2dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:maxLines="3"
         android:gravity="center"
-        android:background="@drawable/textview_border"
-        android:text="TextView"/>
+        android:background="@drawable/textview_border"/>
 
 </LinearLayout>
