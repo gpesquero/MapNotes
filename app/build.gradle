@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId "osm.mapnotes"
-        minSdkVersion 23
-        targetSdkVersion 35
-        versionCode 106
-        versionName "1.06 (Jan 25, 2026)"
+        minSdkVersion 26
+        targetSdkVersion 36
+        versionCode 107
+        versionName "1.07 (Jan 31st, 2026)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,7 +30,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'org.osmdroid:osmdroid-android:6.1.20'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.10.0'
 }
 java {
     toolchain {

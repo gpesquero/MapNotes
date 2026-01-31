@@ -7,10 +7,20 @@ import android.widget.Button;
 
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import osm.mapnotes.MapNotesApplication;
+import osm.mapnotes.MarkerDatabase;
+import osm.mapnotes.MarkerDatabase.MarkerData;
 import osm.mapnotes.R;
 import osm.mapnotes.keepright.KeepRightErrorsPreferencesActivity;
+import osm.mapnotes.osm.OsmFileWriter;
+import osm.mapnotes.osm.OsmNode;
+import osm.mapnotes.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class MainPreferencesActivity extends AppCompatActivity
   implements View.OnClickListener
@@ -24,9 +34,9 @@ public class MainPreferencesActivity extends AppCompatActivity
   Button mButtonTilePreferences;
   Button mButtonKeepRightErrorsPreferences;
   Button mButtonDebugPreferences;
+  Button mButtonExportMarkers;
 
   TextView mTextViewDataPath;
-  //TextView mTextViewExternalDataPath;
   TextView mTextViewMarkerDatabasePath;
 
   @Override
@@ -40,32 +50,27 @@ public class MainPreferencesActivity extends AppCompatActivity
 
     mPreferences = mApp.getPreferences();
 
-    mTextViewVersion=findViewById(R.id.textViewVersion);
+    mTextViewVersion = findViewById(R.id.textViewVersion);
     mTextViewVersion.setText(mApp.getAppName(this) + " v" + mApp.getAppVersion());
 
-    mButtonTilePreferences=findViewById(R.id.buttonTilePreferences);
+    mButtonTilePreferences = findViewById(R.id.buttonTilePreferences);
     mButtonTilePreferences.setOnClickListener(this);
 
-    mButtonKeepRightErrorsPreferences=findViewById(R.id.buttonKeepRightErrorsPreferences);
+    mButtonKeepRightErrorsPreferences = findViewById(R.id.buttonKeepRightErrorsPreferences);
     mButtonKeepRightErrorsPreferences.setOnClickListener(this);
 
-    mButtonDebugPreferences=findViewById(R.id.buttonDebugPreferences);
+    mButtonDebugPreferences = findViewById(R.id.buttonDebugPreferences);
     mButtonDebugPreferences.setOnClickListener(this);
 
-    mTextViewDataPath=findViewById(R.id.textViewDataPath);;
+    mButtonExportMarkers = findViewById(R.id.buttonExportMarkers);
+    mButtonExportMarkers.setOnClickListener(this);
+
+    mTextViewDataPath = findViewById(R.id.textViewDataPath);
     mTextViewDataPath.setText(mPreferences.mDataPath);
 
-    //mTextViewExternalDataPath=findViewById(R.id.textViewExternalDataPath);;
-    //mTextViewExternalDataPath.setText(mPreferences.mExternalDataPath);
-
-    mTextViewMarkerDatabasePath=findViewById(R.id.textViewMarkerDatabasePath);
+    mTextViewMarkerDatabasePath = findViewById(R.id.textViewMarkerDatabasePath);
     mTextViewMarkerDatabasePath.setText(mPreferences.mDataPath +
       mPreferences.mMarkerDatabaseName);
-
-    /*
-    String fullPath = MainActivity.mPreferences.mDatabaseDir + MainActivity.mPreferences.mDatabaseName;
-    mTextViewDatabasePath.setText(fullPath);
-    */
   }
 
   @Override
@@ -85,6 +90,63 @@ public class MainPreferencesActivity extends AppCompatActivity
     {
       Intent intent = new Intent(this, DebugPreferencesActivity.class);
       startActivity(intent);
+    }
+    else if (view == mButtonExportMarkers)
+    {
+      String toastString;
+
+      MarkerDatabase markerDatabase = mApp.getMarkerDatabase();
+
+      if (markerDatabase == null || !markerDatabase.isOpen())
+        toastString = getString(R.string.error_marker_database_is_not_open);
+      else
+      {
+        List<MarkerData> markersData = markerDatabase.getMarkersData();
+
+        if (markersData == null)
+          toastString = getString(R.string.error_getting_map_markers);
+        else
+        {
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+          String fileName = "export_" + LocalDateTime.now().format(formatter) + ".osm";
+
+          OsmFileWriter exportFile = new OsmFileWriter();
+          if (!exportFile.createNewFile(mPreferences.mDataPath + fileName))
+          {
+            toastString = getString(R.string.error_creating_export_file_zz, fileName) +
+                          "(" + exportFile.getErrorString() + ")";
+          }
+          else
+          {
+            // Add nodes.
+            for (MarkerData data : markersData)
+            {
+              OsmNode node = new OsmNode(data.mId, data.mTimeStamp, data.mLat, data.mLon);
+              node.addTag("name", StringUtils.flatString(data.mName));
+              exportFile.addNode(node);
+            }
+
+            // Write file.
+            if (!exportFile.writeFile())
+            {
+              toastString = getString(R.string.error_writing_to_export_file_zz, fileName) +
+                            "(" + exportFile.getErrorString() + ")";
+            }
+            else if (!exportFile.close())
+            {
+              toastString = getString(R.string.error_closing_export_file_zz, fileName) +
+                            "(" + exportFile.getErrorString() + ")";
+            }
+            else
+            {
+              toastString = getString(R.string.exported_xx_map_markers_to_file_zz,
+                                      markersData.size(), fileName);
+            }
+          }
+        }
+      }
+
+      Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
     }
   }
 }

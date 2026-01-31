@@ -11,6 +11,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MarkerDatabase
@@ -35,6 +36,24 @@ public class MarkerDatabase
   SQLiteDatabase mDatabase = null;
 
   private String mLastErrorString;
+
+  public class MarkerData
+  {
+    public long mId;
+    public String mName;
+    public double mLat;
+    public double mLon;
+    public String mTimeStamp;
+
+    MarkerData(long id, String name, double lat, double lon, String timeStamp)
+    {
+      mId = id;
+      mName = name;
+      mLat = lat;
+      mLon = lon;
+      mTimeStamp = timeStamp;
+    }
+  }
 
   public MarkerDatabase()
   {
@@ -105,11 +124,8 @@ public class MarkerDatabase
     return (mDatabase != null);
   }
 
-  public List<MyMarker> getMarkers(MapView mapView, MyMarker.OnMyMarkerListener listener,
-                                   Drawable icon)
+  public List<MarkerData> getMarkersData()
   {
-    ArrayList<MyMarker> markers;
-
     String table = TABLE_MARKERS;
     String[] tableColumns = null;
     String whereClause = null;
@@ -120,16 +136,16 @@ public class MarkerDatabase
 
     if (mDatabase == null)
     {
-      mLastErrorString = "Error getMarkers(): mDatabase==null";
+      mLastErrorString = "Error getMarkersData(): mDatabase==null";
       return null;
     }
+
+    List<MarkerData> markersData = new ArrayList<>();
 
     try
     {
       Cursor cursor = mDatabase.query(table, tableColumns, whereClause, whereArgs, groupBy,
                                       having, orderBy);
-
-      markers = new ArrayList<>();
 
       while(cursor.moveToNext())
       {
@@ -143,18 +159,7 @@ public class MarkerDatabase
 
         String timeStamp = cursor.getString(cursor.getColumnIndexOrThrow(COL_TIME_STAMP));
 
-        GeoPoint pos = new GeoPoint(lat, lon);
-
-        MyMarker marker = new MyMarker(mapView, listener);
-
-        marker.setPosition(pos);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-        marker.setIcon(icon);
-        marker.setDraggable(false);
-        marker.setTitle(name);
-        marker.setId(timeStamp);
-
-        markers.add(marker);
+        markersData.add(new MarkerData(id, name, lat, lon, timeStamp));
       }
 
       cursor.close();
@@ -162,11 +167,47 @@ public class MarkerDatabase
     catch(SQLException e)
     {
       mLastErrorString = "Error getMarkers(): " + e.getMessage();
-
-      markers = null;
+      markersData = null;
     }
 
-    mLastErrorString = "getMarkers() Ok!!";
+    return markersData;
+  }
+
+  public List<MyMarker> loadMarkers(MapView mapView,
+                                    MyMarker.OnMyMarkerListener listener,
+                                    Drawable icon)
+  {
+    ArrayList<MyMarker> markers = new ArrayList<>();;
+
+    List<MarkerData> markersData = getMarkersData();
+
+    if (markersData == null)
+    {
+      mLastErrorString = "Error loadMarkers(): getMarkersData failed!!";
+      return null;
+    }
+
+    Iterator<MarkerData> iter = markersData.iterator();
+
+    while(iter.hasNext())
+    {
+      MarkerData data = iter.next();
+
+      MyMarker marker = new MyMarker(mapView, listener);
+
+      GeoPoint pos = new GeoPoint(data.mLat, data.mLon);
+
+      marker.setPosition(pos);
+      marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+      marker.setIcon(icon);
+      marker.setDraggable(false);
+      marker.setTitle(data.mName);
+      marker.setId(data.mTimeStamp);
+
+      markers.add(marker);
+    }
+
+    mLastErrorString = "loadMarkers() Ok!!";
 
     return markers;
   }

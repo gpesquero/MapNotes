@@ -17,6 +17,14 @@
   <string name="dialog_go_to" translatable="false">Dialog_Go_To</string>
   <string name="dialog_marker" translatable="false">Dialog_Marker</string>
 
+  <string name="error_closing_export_file_zz">Error closing export file \'%1$s\'</string>
+  <string name="error_creating_export_file_zz">Error creating export file \'%1$s\'</string>
+  <string name="error_getting_map_markers">Error getting map markers</string>
+  <string name="error_marker_database_is_not_open">ERROR: Marker database is not open</string>
+  <string name="error_writing_to_export_file_zz">Error writing to export file \'%1$s\'</string>
+  <string name="export_markers">Export markers</string>
+  <string name="exported_xx_map_markers_to_file_zz">Exported %1$d map marker(s) to file \'%2$s\'</string>
+
   <string name="go_to_">Go to…</string>
   <string name="go_to_marker_">Go to marker: </string>
   <string name="go_to_newest_marker">Go to newest marker</string>

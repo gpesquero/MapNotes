@@ -15,6 +15,14 @@
   <string name="debug_preferences">Preferencias de Debug</string>
   <string name="delete">Borrar</string>
 
+  <string name="error_closing_export_file_zz">Error cerrando fichero de exportación \'%1$s\'</string>
+  <string name="error_creating_export_file_zz">Error creando fichero de exportación \'%1$s\'</string>
+  <string name="error_getting_map_markers">ERROR: Obteniendo marcadores del mapa</string>
+  <string name="error_marker_database_is_not_open">ERROR: La base de datos de marcadores no está abierta</string>
+  <string name="error_writing_to_export_file_zz">Error escribiendo al fichero de exportación \'%1$s\'</string>
+  <string name="export_markers">Exportar marcadores</string>
+  <string name="exported_xx_map_markers_to_file_zz">Exportados %1$d marcador(es) al archivo \'%2$s\'</string>
+
   <string name="go_to_">Ir a…</string>
   <string name="go_to_marker_">Ir al marcador: </string>
   <string name="go_to_newest_marker">Ir al marcador más nuevo</string>
