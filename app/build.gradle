@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 36
+    compileSdk = 37
     defaultConfig {
         applicationId "osm.mapnotes"
         minSdkVersion 26
-        targetSdkVersion 36
+        targetSdkVersion 37
         versionCode 107
         versionName "1.07 (Jan 31st, 2026)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -13,7 +13,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     namespace 'osm.mapnotes'
@@ -24,13 +24,12 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'org.osmdroid:osmdroid-android:6.1.20'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.11.1'
 }
 java {
     toolchain {
