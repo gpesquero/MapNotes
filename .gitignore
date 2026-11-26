@@ -1,13 +1,8 @@
 *.iml
 .externalNativeBuild
 .gradle
+.idea/
 .DS_Store
-/.idea/caches
-/.idea/deploymentTargetSelector.xml
-/.idea/deviceManager.xml
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
 /app/release
 /build
 /captures
