@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -308,6 +309,36 @@ public class MainActivity extends AppCompatActivity
       toastText += mGpxManager.getLastErrorString();
 
     Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
+
+    // Set callback for BackPressed.
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+      @Override
+      public void handleOnBackPressed()
+      {
+        Log.w("MapNotes_destroy", "onBackPressed");
+
+        long currentTime = System.currentTimeMillis();
+
+        if ((currentTime - mPreviousCancelTime) > CANCEL_TIMEOUT)
+        {
+          Toast.makeText(getApplicationContext(), R.string.press_again_back,
+                         Toast.LENGTH_SHORT).show();
+
+          mPreviousCancelTime = currentTime;
+        }
+        else
+        {
+          // Pressed back button twice.
+          Log.w("MapNotes_destroy", "onBackPressed twice");
+
+          // Close activity.
+          closeActivity();
+
+          setEnabled(false);
+          getOnBackPressedDispatcher().onBackPressed();
+        }
+      }
+    });
   }
 
   private void updateIcons()
@@ -450,31 +481,6 @@ public class MainActivity extends AppCompatActivity
       updateLocationStatus();
 
       Toast.makeText(this, "Error en requestLocationUpdates", Toast.LENGTH_LONG).show();
-    }
-  }
-
-  @Override
-  public void onBackPressed()
-  {
-    Log.w("MapNotes_destroy", "onBackPressed");
-
-    long currentTime = System.currentTimeMillis();
-
-    if ((currentTime - mPreviousCancelTime) > CANCEL_TIMEOUT)
-    {
-      Toast.makeText(this, R.string.press_again_back, Toast.LENGTH_SHORT).show();
-
-      mPreviousCancelTime = currentTime;
-    }
-    else
-    {
-      // Pressed back button twice.
-      Log.w("MapNotes_destroy", "onBackPressed twice");
-
-      // Close activity.
-      closeActivity();
-
-      super.onBackPressed();
     }
   }
 
