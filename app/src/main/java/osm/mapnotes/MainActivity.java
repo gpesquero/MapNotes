@@ -17,6 +17,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +26,9 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -338,6 +342,58 @@ public class MainActivity extends AppCompatActivity
           getOnBackPressedDispatcher().onBackPressed();
         }
       }
+    });
+
+    adjustWindowInsets(context);
+  }
+
+  private void adjustWindowInsets(Context context)
+  {
+    // Check window insets to prevent controls being placed under status or control bars.
+    ViewCompat.setOnApplyWindowInsetsListener(mMapView, (v, windowInsets) -> {
+
+      // Get window insets.
+      Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+      // Apply the insets as a margin to the top and bottom controls.
+      ViewGroup.MarginLayoutParams mlp;
+
+      float scale = context.getResources().getDisplayMetrics().density;
+
+      // Apply top margin to Compass control.
+      mCompassOverlay.setCompassCenter(35, 35 + insets.top / scale);
+
+      // Apply bottom margin to Zoom control.
+      mMapView.getZoomController().getDisplay().setAdditionalPixelMargins(0, 0, 0, insets.bottom);
+
+      // Apply top margin to Preferences control.
+      mlp = (ViewGroup.MarginLayoutParams) mImageViewPreferences.getLayoutParams();
+      mlp.topMargin = insets.top;
+      mImageViewPreferences.setLayoutParams(mlp);
+
+      // Apply bottom margin to GoTo control.
+      mlp = (ViewGroup.MarginLayoutParams) mImageViewGoTo.getLayoutParams();
+      mlp.bottomMargin = insets.bottom;
+      mImageViewGoTo.setLayoutParams(mlp);
+
+      // Apply bottom margin to ShowKeepRight control.
+      mlp = (ViewGroup.MarginLayoutParams) mImageViewShowKeepRightErrors.getLayoutParams();
+      mlp.bottomMargin = insets.bottom;
+      mImageViewShowKeepRightErrors.setLayoutParams(mlp);
+
+      // Apply bottom margin to Location control.
+      mlp = (ViewGroup.MarginLayoutParams) mImageViewLocation.getLayoutParams();
+      mlp.bottomMargin = insets.bottom;
+      mImageViewLocation.setLayoutParams(mlp);
+
+      // Apply bottom margin to AddMarker control.
+      mlp = (ViewGroup.MarginLayoutParams) mImageViewAddMarker.getLayoutParams();
+      mlp.bottomMargin = insets.bottom;
+      mImageViewAddMarker.setLayoutParams(mlp);
+
+      // Return CONSUMED if you don't want the window insets to keep passing
+      // down to descendant views.
+      return WindowInsetsCompat.CONSUMED;
     });
   }
 
