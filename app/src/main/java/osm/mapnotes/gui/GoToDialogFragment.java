@@ -1,14 +1,15 @@
 package osm.mapnotes.gui;
 
-import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.fragment.app.DialogFragment;
 
 import osm.mapnotes.R;
 

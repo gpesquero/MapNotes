@@ -1,11 +1,12 @@
 package osm.mapnotes.keepright;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import osm.mapnotes.MapNotesApplication;
 import osm.mapnotes.preferences.MapNotesPreferences;

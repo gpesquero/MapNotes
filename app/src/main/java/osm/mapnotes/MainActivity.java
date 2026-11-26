@@ -14,14 +14,16 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity
     mLocationManager = null;
 
     if ((ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
                 ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
     {
@@ -397,9 +399,11 @@ public class MainActivity extends AppCompatActivity
   }
 
   public void onRequestPermissionsResult(int requestCode,
-                                         String[] permissions,
-                                         int[] grantResults)
+                                         @NonNull String[] permissions,
+                                         @NonNull int[] grantResults)
   {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     if (requestCode == REQUEST_CODE_LOCATION)
     {
       for (int i = 0; i < grantResults.length; i++)
@@ -407,16 +411,13 @@ public class MainActivity extends AppCompatActivity
         if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
         {
           mLocationStatus.setHasPermissions(false);
-
           updateLocationStatus();
           return;
         }
       }
 
       mLocationStatus.setHasPermissions(true);
-
       requestLocationUpdates();
-
     }
     else if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE)
     {
@@ -917,6 +918,8 @@ public class MainActivity extends AppCompatActivity
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data)
   {
+    super.onActivityResult(requestCode, resultCode, data);
+
     if (requestCode == REQUEST_CODE_PREFERENCES)
     {
       if (resultCode == TilePreferencesActivity.RESULT_CLEAR_TILE_CACHE)
